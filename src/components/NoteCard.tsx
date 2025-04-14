@@ -4,6 +4,7 @@ import { format } from "date-fns";
 import { Note } from "../types/Note";
 import { MoreHorizontal, Trash2, Pencil } from "lucide-react";
 import { Menu, MenuButton, MenuItem, MenuItems } from "@headlessui/react";
+import Button from "./Button";
 
 interface NoteCardProps {
   note: Note;
@@ -43,7 +44,8 @@ const NoteCard: React.FC<NoteCardProps> = ({
 
       {/* Triple dot menu */}
       <Menu
-        as="div" data-no-view 
+        as="div"
+        data-no-view
         className="absolute bottom-2 right-2 text-right"
       >
         <MenuButton className="p-1 rounded-full hover:bg-gray-100">
@@ -51,27 +53,28 @@ const NoteCard: React.FC<NoteCardProps> = ({
         </MenuButton>
         <MenuItems className="absolute right-0 bottom-8 w-28 bg-white border rounded-md shadow-md z-10">
           <MenuItem>
-            {({ focus }) => (
-              <button
+            {() => (
+              <Button
+                size="sm"
+                variant="ghost"
                 onClick={() => onEdit(note)}
-                className={`${
-                  focus ? "bg-violet-100" : ""
-                } flex items-center gap-2 w-full px-4 py-2 text-sm`}
+                className={`flex items-center gap-2 w-full px-4 py-2 text-sm`}
               >
                 <Pencil size={16} /> Edit
-              </button>
+              </Button>
             )}
           </MenuItem>
           <MenuItem>
             {({ focus }) => (
-              <button
+              <Button
+                variant="ghost"
                 onClick={() => onDelete(note)}
                 className={`${
                   focus ? "bg-red-100" : ""
                 } flex items-center gap-2 w-full px-4 py-2 text-sm text-red-600`}
               >
                 <Trash2 size={16} /> Delete
-              </button>
+              </Button>
             )}
           </MenuItem>
         </MenuItems>

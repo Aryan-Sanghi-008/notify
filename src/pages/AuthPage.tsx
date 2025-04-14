@@ -1,3 +1,4 @@
+import Button from "../components/Button";
 import { useAuth } from "../hooks/useAuth";
 import { FcGoogle } from "react-icons/fc";
 
@@ -12,13 +13,13 @@ export const AuthPage = () => {
           Organize your thoughts. Effortlessly.
         </p>
 
-        <button
+        <Button
           onClick={signIn}
           className="flex items-center justify-center w-full border border-gray-300 px-4 py-2 rounded-xl shadow hover:shadow-md hover:scale-[1.02] transition-all bg-white text-gray-700"
         >
           <FcGoogle className="text-2xl mr-3" />
           Sign in with Google
-        </button>
+        </Button>
       </div>
     </div>
   );

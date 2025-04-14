@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { Dialog, DialogPanel, DialogTitle } from "@headlessui/react";
+import Button from "./Button";
 
 type NoteModalProps = {
   isOpen: boolean;
@@ -54,18 +55,14 @@ export default function NoteModal({
             placeholder="Write your note..."
           />
           <div className="flex justify-end gap-2">
-            <button
+            <Button
+              variant="ghost"
               onClick={onClose}
               className="px-4 py-2 text-gray-600 hover:text-gray-800"
             >
               Cancel
-            </button>
-            <button
-              onClick={handleSubmit}
-              className="px-4 py-2 bg-violet-600 text-white rounded hover:bg-violet-700"
-            >
-              Save
-            </button>
+            </Button>
+            <Button onClick={handleSubmit}>Save</Button>
           </div>
         </DialogPanel>
       </div>

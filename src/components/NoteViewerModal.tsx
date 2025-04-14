@@ -2,6 +2,7 @@
 import { Dialog, DialogPanel, DialogTitle } from "@headlessui/react";
 import { format } from "date-fns";
 import { Note } from "../types/Note";
+import Button from "./Button";
 
 type Props = {
   isOpen: boolean;
@@ -28,12 +29,12 @@ const NoteViewerModal = ({ isOpen, note, onClose }: Props) => {
             Created: {format(note.createdAt.toDate(), "PPpp")}
           </p>
           <div className="flex justify-end mt-4">
-            <button
-              className="text-sm text-violet-600 hover:underline"
+            <Button
+              size="sm"
               onClick={onClose}
             >
               Close
-            </button>
+            </Button>
           </div>
         </DialogPanel>
       </div>

@@ -15,7 +15,7 @@ import WarningModal from "../components/WarningModal";
 import NoteViewerModal from "../components/NoteViewerModal";
 import { useDispatch } from "react-redux";
 import { addToast } from "../store/slices/toastSlice";
-import { v4 as uuidv4 } from 'uuid';
+import { v4 as uuidv4 } from "uuid";
 
 const NotesPage = () => {
   const dispatch = useDispatch();

@@ -72,7 +72,7 @@ const Dashboard = () => {
           title="Latest Note"
           value={recentNote?.title}
           icon={<FaClock />}
-          description={`You created this on ${recentNote?.createdAt?.toDate()}`}
+          description={recentNote?.createdAt?.toDate() ? `You created this on ${recentNote?.createdAt?.toDate()}` : `No notes found`}
           theme="success"
           onClick={() => console.log("Show latest note", recentNote)}
         />
