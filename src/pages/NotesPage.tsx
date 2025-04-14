@@ -127,16 +127,18 @@ const NotesPage = () => {
           <h1 className="text-2xl md:text-3xl font-bold text-violet-700">
             Your Notes
           </h1>
-          <Button
-            icon={<Plus className="w-4 h-4" />}
-            onClick={() => {
-              setEditingNote(null);
-              setModalOpen(true);
-            }}
-            className="w-full sm:w-auto"
-          >
-            New Note
-          </Button>
+          {filteredNotes.length > 0 && (
+            <Button
+              icon={<Plus className="w-4 h-4" />}
+              onClick={() => {
+                setEditingNote(null);
+                setModalOpen(true);
+              }}
+              className="w-full sm:w-auto"
+            >
+              New Note
+            </Button>
+          )}
         </div>
 
         {/* Notes Grid */}

@@ -12,6 +12,7 @@ import { getRecentNotes, getUserNotesCount } from "../lib/firebase/notes";
 import { Note } from "../types/Note";
 import Button from "../components/Button";
 import NoteViewerModal from "../components/NoteViewerModal";
+import { getNoteEmoji, timeSince } from "../utils/helperFunctions";
 
 const Dashboard = () => {
   const { user } = useAuth();
@@ -96,41 +97,80 @@ const Dashboard = () => {
         </section>
 
         <section className="bg-white rounded-xl border border-gray-200 shadow-sm p-6">
-          <div className="flex justify-between items-center mb-4">
+          <div className="flex justify-between items-center mb-6">
             <h2 className="text-lg font-semibold text-gray-800">
               Recent Notes
             </h2>
-            <Button size="sm" onClick={() => navigate("/notes")}>
-              View All
-            </Button>
+            {recentNotes?.length > 0 && <Button
+              size="sm"
+              variant="outline"
+              onClick={() => navigate("/notes")}
+            >
+              View All →
+            </Button>}
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
             {recentNotes.length > 0 ? (
               recentNotes.map((note) => (
                 <div
                   key={note.id}
-                  className="p-4 border rounded-lg hover:bg-gray-50 cursor-pointer transition-colors"
+                  className="group relative p-5 rounded-lg border border-gray-100 hover:border-violet-200 cursor-pointer transition-all duration-200 hover:shadow-md bg-white"
                   onClick={() => {
                     setViewingNote(note);
                     setViewerOpen(true);
                   }}
                 >
-                  <h3 className="font-medium text-gray-800">{note.title}</h3>
-                  <p className="text-sm text-gray-500 line-clamp-2 mt-1">
-                    {note.content || "No content"}
-                  </p>
-                  <div className="mt-2 flex items-center text-xs text-gray-400">
-                    <FaClock className="mr-1" />
-                    {note.createdAt.toDate().toLocaleDateString()}
+                  {/* Note Type Indicator */}
+                  <div className="absolute top-3 right-3 w-8 h-8 rounded-full bg-violet-50 flex items-center justify-center">
+                    <span className="text-violet-600 text-lg">
+                      {note.content?.includes("#") ? "🏷️" : "📄"}
+                    </span>
+                  </div>
+
+                  {/* Note Content Preview */}
+                  <div className="mb-4">
+                    <div className="w-full h-32 mb-3 rounded-md bg-gradient-to-br from-violet-50 to-pink-50 flex items-center justify-center">
+                      <span className="text-4xl">
+                        {getNoteEmoji(note.content || "📑")}
+                      </span>
+                    </div>
+                    <h3 className="font-medium text-gray-800 line-clamp-1">
+                      {note.title || "Untitled Note"}
+                    </h3>
+                  </div>
+
+                  {/* Metadata */}
+                  <div className="flex items-center justify-between text-sm">
+                    <div className="flex items-center space-x-2">
+                      <span className="w-2 h-2 rounded-full bg-violet-400 animate-pulse"></span>
+                      <span className="text-gray-500">
+                        {timeSince(note.createdAt.toDate())}
+                      </span>
+                    </div>
+                    <div className="flex items-center space-x-1 text-gray-400">
+                      <FaClock className="text-sm" />
+                      <span>
+                        {note.updatedAt.toDate().toLocaleTimeString([], {
+                          hour: "2-digit",
+                          minute: "2-digit",
+                        })}
+                      </span>
+                    </div>
                   </div>
                 </div>
               ))
             ) : (
-              <div className="text-center py-4 col-span-full">
-                <p className="text-gray-500">No notes found. Create one now!</p>
-                <Button className="mt-2" onClick={() => navigate("/notes/new")}>
-                  Create Note
+              <div className="text-center py-8 col-span-full space-y-4">
+                <div className="mx-auto w-24 h-24 bg-violet-50 rounded-full flex items-center justify-center">
+                  <FaStickyNote className="text-3xl text-violet-600" />
+                </div>
+                <p className="text-gray-600">No notes found. Start creating!</p>
+                <Button
+                  icon={<FaStickyNote />}
+                  onClick={() => navigate("/notes")}
+                >
+                  New Note
                 </Button>
               </div>
             )}
