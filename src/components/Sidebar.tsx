@@ -99,7 +99,7 @@ const Sidebar = () => {
                 isSidebarOpen ? "block" : "hidden"
               }`}
             >
-              Stickify
+              NotiFy
             </h2>
           </div>
 

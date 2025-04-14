@@ -1,6 +1,6 @@
-# Stickify ✍️ — Built to help you stick with your thoughts!
+# NotiFy ✍️ — Built to help you stick with your thoughts!
 
-Stickify is a personalized notes application built using **React**, **TypeScript**, **Tailwind CSS**, and **Firebase**. It allows users to create, view, edit, delete, and filter notes by date, week, or month. Stickify also provides a smooth user experience with Firebase authentication using **Google Sign-In** and **Redux Toolkit** for state management.
+NotiFy is a personalized notes application built using **React**, **TypeScript**, **Tailwind CSS**, and **Firebase**. It allows users to create, view, edit, delete, and filter notes by date, week, or month. NotiFy also provides a smooth user experience with Firebase authentication using **Google Sign-In** and **Redux Toolkit** for state management.
 
 ---
 
@@ -35,7 +35,7 @@ Stickify is a personalized notes application built using **React**, **TypeScript
 
 ```bash
 git clone https://github.com/Aryan-Sanghi-008/StickyFy.git
-cd stickify
+cd notify
 ```
 
 ### 2. Folder Structure

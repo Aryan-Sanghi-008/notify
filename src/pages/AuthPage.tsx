@@ -8,7 +8,7 @@ export const AuthPage = () => {
   return (
     <div className="min-h-screen w-screen bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center">
       <div className="bg-white rounded-2xl shadow-lg p-8  text-center">
-        <h1 className="text-4xl font-bold mb-4 text-gray-800">Stickify 📝</h1>
+        <h1 className="text-4xl font-bold mb-4 text-gray-800">NotiFy 📝</h1>
         <p className="text-gray-500 mb-6">
           Organize your thoughts. Effortlessly.
         </p>
