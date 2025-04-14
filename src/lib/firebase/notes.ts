@@ -59,6 +59,22 @@ export const getLastCreatedNote = async (
   return { id: doc.id, ...doc.data() } as Note;
 };
 
+// READ : Latest 10 Notes
+export const getRecentNotes = async (userId: string): Promise<Note[]> => {
+  const q = query(
+    collection(db, "notes"),
+    where("userId", "==", userId),
+    orderBy("createdAt", "desc"),
+    limit(10)
+  );
+
+  const querySnapshot = await getDocs(q);
+  return querySnapshot.docs.map((doc) => ({
+    id: doc.id,
+    ...doc.data(),
+  })) as Note[];
+};
+
 // READ: All Notes
 export const getUserNotes = async (userId: string): Promise<Note[]> => {
   const q = query(collection(db, "notes"), where("userId", "==", userId));

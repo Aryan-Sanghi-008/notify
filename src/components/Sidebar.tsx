@@ -1,157 +1,96 @@
 // src/components/Sidebar.tsx
-import {
-  FaUser,
-  FaTachometerAlt,
-  FaStickyNote,
-  FaSignOutAlt,
-  FaCog,
-  FaQuestionCircle,
-  FaBars, // Hamburger icon
-} from "react-icons/fa";
+import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../hooks/useAuth";
+import { FaTachometerAlt, FaStickyNote, FaSignOutAlt, FaBars } from "react-icons/fa";
 import Button from "./Button";
-import { useState } from "react";
+import { GiNotebook } from "react-icons/gi";
 
 const Sidebar = () => {
   const navigate = useNavigate();
   const { logout } = useAuth();
-  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+  const [isExpanded, setIsExpanded] = useState(false);
 
-  const navigationItems = [
-    {
-      section: "Main",
-      items: [
-        {
-          label: "Dashboard",
-          icon: <FaTachometerAlt />,
-          onClick: () => navigate("/dashboard"),
-        },
-        {
-          label: "Notes",
-          icon: <FaStickyNote />,
-          onClick: () => navigate("/notes"),
-        },
-      ],
-    },
-    // {
-    //   section: "Account",
-    //   items: [
-    //     {
-    //       label: "Profile",
-    //       icon: <FaUser />,
-    //       onClick: () => navigate("/profile"),
-    //     },
-    //   ],
-    // },
-    // {
-    //   section: "Settings",
-    //   items: [
-    //     {
-    //       label: "Change Password",
-    //       icon: <FaCog />,
-    //       onClick: () => navigate("/settings/password"),
-    //     },
-    //     {
-    //       label: "Notifications",
-    //       icon: <FaCog />,
-    //       onClick: () => navigate("/settings/notifications"),
-    //     },
-    //   ],
-    // },
-    // {
-    //   section: "Help",
-    //   items: [
-    //     {
-    //       label: "FAQ",
-    //       icon: <FaQuestionCircle />,
-    //       onClick: () => navigate("/help/faq"),
-    //     },
-    //     {
-    //       label: "Contact Support",
-    //       icon: <FaQuestionCircle />,
-    //       onClick: () => navigate("/help/contact"),
-    //     },
-    //   ],
-    // },
+  const navItems = [
+    { label: "Dashboard", icon: <FaTachometerAlt />, path: "/dashboard" },
+    { label: "Notes", icon: <FaStickyNote />, path: "/notes" },
   ];
 
   return (
-    <div className="flex relative">
-      {/* Sidebar */}
-      <div
-        className={`fixed z-[999999] top-0 left-0 h-screen bg-white shadow-lg p-4 flex flex-col justify-between transition-all duration-300 ${
-          isSidebarOpen ? "w-64" : "w-16"
-        }`}
-      >
-        <div>
-          {/* Hamburger Icon */}
-          <div className="flex">
-            <div
-              className="text-xl mb-8 mt-[0.4rem] mr-4 text-purple-600 cursor-pointer"
-              onClick={() => setIsSidebarOpen(!isSidebarOpen)}
-            >
-              <FaBars />
-            </div>
-
-            <h2
-              className={`text-2xl font-bold text-purple-600 transition-all duration-300 ${
-                isSidebarOpen ? "block" : "hidden"
-              }`}
-            >
-              NotiFy
-            </h2>
-          </div>
-
-          {/* Sidebar Navigation */}
-          {navigationItems.map((group, idx) => (
-            <div key={idx} className="mb-6">
-              <h3
-                className={`text-xs font-semibold text-gray-400 uppercase mb-2 transition-all duration-300 ${
-                  isSidebarOpen ? "block" : "hidden"
-                }`}
-              >
-                {group.section}
-              </h3>
-              <div className="flex flex-col gap-2">
-                {group.items.map((item, i) => (
-                  <Button
-                    key={i}
-                    variant="ghost"
-                    className="flex items-center gap-3 text-left text-gray-700 hover:text-purple-600 transition duration-300"
-                    onClick={item.onClick}
-                  >
-                    {/* Icon always visible */}
-                    <span className="block">{item.icon}</span>
-
-                    {/* Text label only visible when sidebar is open */}
-                    <span
-                      className={`transition-all duration-300 ${
-                        isSidebarOpen ? "block" : "hidden"
-                      }`}
-                    >
-                      {item.label}
-                    </span>
-                  </Button>
-                ))}
-              </div>
-            </div>
-          ))}
+    <aside
+      className={`fixed h-screen bg-white shadow-xl z-50 transition-all duration-300 ease-in-out ${
+        isExpanded ? "w-64" : "w-16"
+      }`}
+    >
+      <div className="flex flex-col h-full p-4">
+        {/* Header */}
+        <div className="flex items-center justify-between mb-8 h-12">
+          <button
+            onClick={() => setIsExpanded(!isExpanded)}
+            className="p-2 rounded-lg hover:bg-purple-50 transition-colors"
+          >
+            <FaBars className="text-purple-600 text-xl" />
+          </button>
+          <span
+            className={`text-xl flex font-bold text-purple-600 transition-opacity duration-300 ${
+              isExpanded ? "opacity-100" : "opacity-0"
+            }`}
+          >
+            <GiNotebook color="#fb7474" /> NotiFy
+          </span>
         </div>
 
+        {/* Navigation Items */}
+        <nav className="flex-1 space-y-2">
+          {navItems.map((item) => (
+            <Button
+              key={item.label}
+              variant="ghost"
+              onClick={() => {
+                navigate(item.path);
+                setIsExpanded(false);
+              }}
+              className={`w-full flex items-center rounded-lg p-3 group transition-all duration-300 ${
+                isExpanded ? "gap-3 justify-start" : "justify-center"
+              }`}
+            >
+              <span className="text-purple-600 text-lg p-2 rounded-md bg-purple-50 group-hover:bg-purple-100 transition-colors">
+                {item.icon}
+              </span>
+              <span
+                className={`text-gray-600 font-medium transition-all duration-300 overflow-hidden ${
+                  isExpanded ? "opacity-100 max-w-full" : "opacity-0 max-w-0"
+                }`}
+              >
+                {item.label}
+              </span>
+            </Button>
+          ))}
+        </nav>
+
         {/* Logout Button */}
-        <Button
-          variant="ghost"
-          className="flex items-center gap-2 text-red-500 hover:text-red-700 transition duration-300"
-          onClick={logout}
-        >
-          <FaSignOutAlt />
-          <span className={`${isSidebarOpen ? "block" : "hidden"}`}>
-            Logout
-          </span>
-        </Button>
+        <div className="border-t pt-4">
+          <Button
+            variant="ghost"
+            onClick={logout}
+            className={`w-full flex items-center rounded-lg p-3 transition-all duration-300 ${
+              isExpanded ? "gap-3 justify-start" : "justify-center"
+            }`}
+          >
+            <span className="text-red-500 text-lg p-2 rounded-md bg-red-50 hover:bg-red-100 transition-colors">
+              <FaSignOutAlt />
+            </span>
+            <span
+              className={`text-red-500 font-medium transition-all duration-300 overflow-hidden ${
+                isExpanded ? "opacity-100 max-w-full" : "opacity-0 max-w-0"
+              }`}
+            >
+              Logout
+            </span>
+          </Button>
+        </div>
       </div>
-    </div>
+    </aside>
   );
 };
 

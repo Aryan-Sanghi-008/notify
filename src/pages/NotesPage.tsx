@@ -16,6 +16,7 @@ import NoteViewerModal from "../components/NoteViewerModal";
 import { useDispatch } from "react-redux";
 import { addToast } from "../store/slices/toastSlice";
 import { v4 as uuidv4 } from "uuid";
+import { FaStickyNote } from "react-icons/fa";
 
 const NotesPage = () => {
   const dispatch = useDispatch();
@@ -119,60 +120,84 @@ const NotesPage = () => {
   }, [user]);
 
   return (
-    <div className="ml-10 w-screen min-h-screen bg-white">
-      {/* Header */}
-      <div className="flex items-center justify-between mb-6">
-        <h1 className="ml-4 text-3xl font-bold text-violet-700">Your Notes</h1>
-        <Button
-          icon={<Plus />}
-          onClick={() => {
+    <div className="ml-10 pr-5 min-h-screen bg-white">
+      <div className="max-w-7xl mx-auto py-4">
+        {/* Header */}
+        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-8 px-4">
+          <h1 className="text-2xl md:text-3xl font-bold text-violet-700">
+            Your Notes
+          </h1>
+          <Button
+            icon={<Plus className="w-4 h-4" />}
+            onClick={() => {
+              setEditingNote(null);
+              setModalOpen(true);
+            }}
+            className="w-full sm:w-auto"
+          >
+            New Note
+          </Button>
+        </div>
+
+        {/* Notes Grid */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 px-4">
+          {filteredNotes.map((note) => (
+            <NoteCard
+              key={note.id}
+              note={note}
+              onEdit={handleEditNote}
+              onDelete={handleRequestDelete}
+              onView={handleViewNote}
+            />
+          ))}
+        </div>
+
+        {/* Empty State */}
+        {filteredNotes.length === 0 && (
+          <div className="text-center py-12">
+            <div className="text-gray-400 mb-4">
+              <FaStickyNote className="text-6xl inline-block" />
+            </div>
+            <h3 className="text-lg font-medium text-gray-700 mb-2">
+              No notes found
+            </h3>
+            <p className="text-gray-500 mb-4">
+              Get started by creating a new note
+            </p>
+            <Button
+              icon={<Plus className="w-4 h-4" />}
+              onClick={() => setModalOpen(true)}
+            >
+              Create First Note
+            </Button>
+          </div>
+        )}
+
+        {/* Modals */}
+        <NoteModal
+          isOpen={modalOpen}
+          onClose={() => {
             setEditingNote(null);
-            setModalOpen(true);
+            setModalOpen(false);
           }}
-        >
-          New Note
-        </Button>
+          onSave={handleSaveNote}
+          initialTitle={editingNote?.title || ""}
+          initialContent={editingNote?.content || ""}
+        />
+
+        <WarningModal
+          isOpen={warningOpen}
+          onConfirm={confirmDelete}
+          onCancel={() => setWarningOpen(false)}
+          message="Are you sure you want to delete this note? This action cannot be undone."
+        />
+
+        <NoteViewerModal
+          isOpen={viewerOpen}
+          note={viewingNote}
+          onClose={() => setViewerOpen(false)}
+        />
       </div>
-
-      {/* Notes Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-        {filteredNotes.map((note) => (
-          <NoteCard
-            key={note.id}
-            note={note}
-            onEdit={handleEditNote}
-            onDelete={handleRequestDelete}
-            onView={handleViewNote}
-          />
-        ))}
-      </div>
-
-      {/* Note Modal */}
-      <NoteModal
-        isOpen={modalOpen}
-        onClose={() => {
-          setEditingNote(null);
-          setModalOpen(false);
-        }}
-        onSave={handleSaveNote}
-        initialTitle={editingNote?.title || ""}
-        initialContent={editingNote?.content || ""}
-      />
-
-      {/* Warning MOdal */}
-      <WarningModal
-        isOpen={warningOpen}
-        onConfirm={confirmDelete}
-        onCancel={() => setWarningOpen(false)}
-        message="Are you sure you want to delete this note? This action cannot be undone."
-      />
-
-      {/* View Note */}
-      <NoteViewerModal
-        isOpen={viewerOpen}
-        note={viewingNote}
-        onClose={() => setViewerOpen(false)}
-      />
     </div>
   );
 };

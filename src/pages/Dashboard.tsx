@@ -3,97 +3,146 @@ import {
   FaStickyNote,
   FaUserCircle,
   FaClock,
-  FaEnvelope,
+  FaCalendar,
 } from "react-icons/fa";
 import InfoCard from "../components/InfoCard";
 import { useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";
-import { getLastCreatedNote, getUserNotesCount } from "../lib/firebase/notes";
+import { getRecentNotes, getUserNotesCount } from "../lib/firebase/notes";
 import { Note } from "../types/Note";
+import Button from "../components/Button";
+import NoteViewerModal from "../components/NoteViewerModal";
 
 const Dashboard = () => {
   const { user } = useAuth();
   const navigate = useNavigate();
   const [notesCount, setNotesCount] = useState<number>(0);
-  const [recentNote, setRecentNote] = useState<Note | null>(null);
+  const [recentNotes, setRecentNotes] = useState<Note[]>([]);
+  const [viewingNote, setViewingNote] = useState<Note | null>(null);
+  const [viewerOpen, setViewerOpen] = useState(false);
+
+  const getWeeklyActivity = () => {
+    const oneWeekAgo = new Date();
+    oneWeekAgo.setDate(oneWeekAgo.getDate() - 7);
+    return recentNotes.filter((note) => note.createdAt.toDate() > oneWeekAgo)
+      .length;
+  };
 
   useEffect(() => {
-    const fetchNotesCount = async () => {
-      const count = await getUserNotesCount(user?.uid ?? "");
-      setNotesCount(count);
-    };
+    if (user) {
+      const fetchNotesCount = async () => {
+        const count = await getUserNotesCount(user?.uid);
+        const notes = await getRecentNotes(user.uid);
+        setNotesCount(count);
+        setRecentNotes(notes);
+      };
 
-    const getLatestNote = async () => {
-      const recentNote = await getLastCreatedNote(user?.uid ?? "");
-      setRecentNote(recentNote);
-    };
-
-    fetchNotesCount();
-    getLatestNote();
+      fetchNotesCount();
+    }
   }, [user]);
 
   return (
-    <div className="ml-16 w-screen space-y-6">
-      <header className="flex items-center justify-between">
-        <div className="flex items-center gap-4">
-          {user?.photoURL ? (
-            <img
-              src={user.photoURL}
-              alt="User Avatar"
-              className="w-14 h-14 rounded-full object-cover border-2 border-violet-400"
-            />
-          ) : (
-            <FaUserCircle className="text-5xl text-violet-600" />
-          )}
+    <div className="p-8 bg-gray-50 min-h-screen">
+      <div className="max-w-7xl mx-auto space-y-8">
+        <header className="flex flex-col sm:flex-row items-start sm:items-center justify-between">
+          <div className="flex items-center gap-4 mb-4 sm:mb-0">
+            {user && user?.photoURL ? (
+              <img
+                src={user.photoURL}
+                alt="User Avatar"
+                className="w-14 h-14 rounded-full object-cover border-2 border-violet-400 shadow-sm"
+              />
+            ) : (
+              <FaUserCircle className="text-5xl text-violet-600" />
+            )}
 
-          <div>
-            <h1 className="text-3xl font-bold text-gray-800">
-              Welcome, {user?.displayName?.split(" ")[0] || "User"} 🎉
-            </h1>
-            <p className="text-gray-600 text-sm">
-              Let’s make some awesome notes today.
-            </p>
+            <div>
+              <h1 className="text-2xl md:text-3xl font-bold text-gray-800">
+                Welcome, {user?.displayName?.split(" ")[0] || "User"} 🎉
+              </h1>
+              <p className="text-gray-600 text-sm">
+                Let's make some awesome notes today.
+              </p>
+            </div>
           </div>
-        </div>
-      </header>
+        </header>
 
-      <section className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-        <InfoCard
-          title="Total Notes"
-          value={notesCount}
-          icon={<FaStickyNote />}
-          description="You've made a dozen notes!"
-          theme="primary"
-          progress={80}
-          onClick={() => navigate("/notes")}
+        <section className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
+          <InfoCard
+            title="Total Notes"
+            value={notesCount}
+            icon={<FaStickyNote className="text-violet-600" />}
+            description="Your current notes count"
+            theme="primary"
+            progress={Math.min((notesCount / 50) * 100, 100)}
+            onClick={() => navigate("/notes")}
+          />
+
+          <InfoCard
+            title="Weekly Activity"
+            value={getWeeklyActivity()}
+            icon={<FaClock className="text-violet-600" />}
+            description="Notes created this week"
+            theme="success"
+          />
+
+          <InfoCard
+            title="Productivity Streak"
+            value="3 days"
+            icon={<FaCalendar className="text-violet-600" />}
+            description="Consecutive days with notes"
+            theme="warning"
+          />
+        </section>
+
+        <section className="bg-white rounded-xl border border-gray-200 shadow-sm p-6">
+          <div className="flex justify-between items-center mb-4">
+            <h2 className="text-lg font-semibold text-gray-800">
+              Recent Notes
+            </h2>
+            <Button size="sm" onClick={() => navigate("/notes")}>
+              View All
+            </Button>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            {recentNotes.length > 0 ? (
+              recentNotes.map((note) => (
+                <div
+                  key={note.id}
+                  className="p-4 border rounded-lg hover:bg-gray-50 cursor-pointer transition-colors"
+                  onClick={() => {
+                    setViewingNote(note);
+                    setViewerOpen(true);
+                  }}
+                >
+                  <h3 className="font-medium text-gray-800">{note.title}</h3>
+                  <p className="text-sm text-gray-500 line-clamp-2 mt-1">
+                    {note.content || "No content"}
+                  </p>
+                  <div className="mt-2 flex items-center text-xs text-gray-400">
+                    <FaClock className="mr-1" />
+                    {note.createdAt.toDate().toLocaleDateString()}
+                  </div>
+                </div>
+              ))
+            ) : (
+              <div className="text-center py-4 col-span-full">
+                <p className="text-gray-500">No notes found. Create one now!</p>
+                <Button className="mt-2" onClick={() => navigate("/notes/new")}>
+                  Create Note
+                </Button>
+              </div>
+            )}
+          </div>
+        </section>
+
+        <NoteViewerModal
+          isOpen={viewerOpen}
+          note={viewingNote}
+          onClose={() => setViewerOpen(false)}
         />
-
-        <InfoCard
-          title="Latest Note"
-          value={recentNote?.title}
-          icon={<FaClock />}
-          description={recentNote?.createdAt?.toDate() ? `You created this on ${recentNote?.createdAt?.toDate()}` : `No notes found`}
-          theme="success"
-          onClick={() => console.log("Show latest note", recentNote)}
-        />
-
-        <InfoCard
-          title="Profile Email"
-          value={user?.email || "Not available"}
-          icon={<FaEnvelope />}
-          description="Your linked email"
-          theme="default"
-        />
-      </section>
-
-      <section>
-        <h2 className="text-xl font-semibold text-gray-800 mb-4">
-          Recent Notes
-        </h2>
-        <div className="bg-white p-4 rounded-xl border border-gray-200 shadow-sm text-gray-600">
-          <p>Coming soon: List of your latest notes ✨</p>
-        </div>
-      </section>
+      </div>
     </div>
   );
 };

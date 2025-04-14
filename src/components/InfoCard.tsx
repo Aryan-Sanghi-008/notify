@@ -32,10 +32,10 @@ const InfoCard = ({
 }: InfoCardProps) => {
   return (
     <motion.div
-      whileHover={{ scale: 1.00 }}
+      whileHover={{ scale: 1.05 }}
       whileTap={{ scale: 0.98 }}
       onClick={onClick}
-      className={`group bg-white rounded-xl border p-5 sm:p-6 shadow-sm transition-all duration-300 ease-in-out hover:shadow-md cursor-pointer ${themeStyles[theme]} ${className}`}
+      className={`group bg-white rounded-xl border p-5 shadow-sm transition-all duration-300 ease-in-out hover:shadow-md cursor-pointer ${themeStyles[theme]} ${className}`}
     >
       <div className="flex items-start gap-4">
         {icon && (
@@ -44,9 +44,11 @@ const InfoCard = ({
           </div>
         )}
         <div className="flex-1 min-w-0">
-          <h3 className="text-sm font-medium text-gray-500">{title}</h3>
-          <div className="text-3xl font-bold text-gray-800 leading-tight break-words whitespace-normal w-full">
-            <span className="break-words text-base sm:text-lg">{value}</span>
+          <h3 className="text-xs font-semibold text-gray-500 uppercase tracking-wide">
+            {title}
+          </h3>
+          <div className="mt-2">
+            <span className="text-xl text-wrap font-bold text-gray-900">{value}</span>
           </div>
           {description && (
             <p className="text-xs text-gray-500 mt-1 leading-snug break-words">
