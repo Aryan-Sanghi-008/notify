@@ -34,46 +34,46 @@ const Sidebar = () => {
         },
       ],
     },
-    {
-      section: "Account",
-      items: [
-        {
-          label: "Profile",
-          icon: <FaUser />,
-          onClick: () => navigate("/profile"),
-        },
-      ],
-    },
-    {
-      section: "Settings",
-      items: [
-        {
-          label: "Change Password",
-          icon: <FaCog />,
-          onClick: () => navigate("/settings/password"),
-        },
-        {
-          label: "Notifications",
-          icon: <FaCog />,
-          onClick: () => navigate("/settings/notifications"),
-        },
-      ],
-    },
-    {
-      section: "Help",
-      items: [
-        {
-          label: "FAQ",
-          icon: <FaQuestionCircle />,
-          onClick: () => navigate("/help/faq"),
-        },
-        {
-          label: "Contact Support",
-          icon: <FaQuestionCircle />,
-          onClick: () => navigate("/help/contact"),
-        },
-      ],
-    },
+    // {
+    //   section: "Account",
+    //   items: [
+    //     {
+    //       label: "Profile",
+    //       icon: <FaUser />,
+    //       onClick: () => navigate("/profile"),
+    //     },
+    //   ],
+    // },
+    // {
+    //   section: "Settings",
+    //   items: [
+    //     {
+    //       label: "Change Password",
+    //       icon: <FaCog />,
+    //       onClick: () => navigate("/settings/password"),
+    //     },
+    //     {
+    //       label: "Notifications",
+    //       icon: <FaCog />,
+    //       onClick: () => navigate("/settings/notifications"),
+    //     },
+    //   ],
+    // },
+    // {
+    //   section: "Help",
+    //   items: [
+    //     {
+    //       label: "FAQ",
+    //       icon: <FaQuestionCircle />,
+    //       onClick: () => navigate("/help/faq"),
+    //     },
+    //     {
+    //       label: "Contact Support",
+    //       icon: <FaQuestionCircle />,
+    //       onClick: () => navigate("/help/contact"),
+    //     },
+    //   ],
+    // },
   ];
 
   return (
