@@ -30,12 +30,10 @@ const variantStyles: Record<Variant, string> = {
     "bg-gradient-to-r from-gray-100 to-gray-200 text-gray-800 hover:from-gray-200 hover:to-gray-300",
   outline:
     "border border-gray-400 text-gray-800 bg-transparent hover:bg-gray-100",
-  ghost:
-    "text-gray-700 hover:bg-gray-100",
+  ghost: "text-gray-700 hover:bg-gray-100",
   danger:
     "bg-gradient-to-r from-red-500 to-rose-600 text-white hover:from-red-600 hover:to-rose-700",
 };
-
 
 export default function Button({
   children,

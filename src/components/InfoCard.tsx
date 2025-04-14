@@ -48,7 +48,9 @@ const InfoCard = ({
             {title}
           </h3>
           <div className="mt-2">
-            <span className="text-xl text-wrap font-bold text-gray-900">{value}</span>
+            <span className="text-xl text-wrap font-bold text-gray-900">
+              {value}
+            </span>
           </div>
           {description && (
             <p className="text-xs text-gray-500 mt-1 leading-snug break-words">

@@ -2,7 +2,12 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../hooks/useAuth";
-import { FaTachometerAlt, FaStickyNote, FaSignOutAlt, FaBars } from "react-icons/fa";
+import {
+  FaTachometerAlt,
+  FaStickyNote,
+  FaSignOutAlt,
+  FaBars,
+} from "react-icons/fa";
 import Button from "./Button";
 import { GiNotebook } from "react-icons/gi";
 

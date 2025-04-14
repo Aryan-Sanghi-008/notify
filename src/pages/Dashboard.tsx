@@ -101,13 +101,15 @@ const Dashboard = () => {
             <h2 className="text-lg font-semibold text-gray-800">
               Recent Notes
             </h2>
-            {recentNotes?.length > 0 && <Button
-              size="sm"
-              variant="outline"
-              onClick={() => navigate("/notes")}
-            >
-              View All →
-            </Button>}
+            {recentNotes?.length > 0 && (
+              <Button
+                size="sm"
+                variant="outline"
+                onClick={() => navigate("/notes")}
+              >
+                View All →
+              </Button>
+            )}
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">

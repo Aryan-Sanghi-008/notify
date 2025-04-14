@@ -11,13 +11,13 @@ export const AuthPage = () => {
     <div className="min-h-screen w-screen bg-gradient-to-br from-violet-900 via-indigo-900 to-purple-900 flex items-center justify-center p-4">
       <div className="max-w-6xl w-full flex bg-gray-900/80 backdrop-blur-2xl rounded-3xl overflow-hidden shadow-2xl border border-white/10">
         {/* Left Illustration Section */}
-        <motion.div 
+        <motion.div
           initial={{ opacity: 0, x: -20 }}
           animate={{ opacity: 1, x: 0 }}
           className="hidden md:flex flex-1 bg-gradient-to-tr from-violet-800 to-purple-700 p-12 items-center justify-center relative"
         >
           <div className="space-y-8 text-gray-100 z-10">
-            <motion.h2 
+            <motion.h2
               initial={{ y: 20 }}
               animate={{ y: 0 }}
               className="text-4xl font-bold text-white"
@@ -25,7 +25,11 @@ export const AuthPage = () => {
               Welcome to NotiFy ✨
             </motion.h2>
             <ul className="space-y-6 text-lg">
-              {['Smart Note Organization', 'Instant Search & Tags', 'Cross-Device Sync'].map((feature) => (
+              {[
+                "Smart Note Organization",
+                "Instant Search & Tags",
+                "Cross-Device Sync",
+              ].map((feature) => (
                 <li key={feature} className="flex items-center gap-3">
                   <div className="w-8 h-8 rounded-full bg-white/10 flex items-center justify-center">
                     <FiArrowRight className="text-white" />
@@ -35,7 +39,7 @@ export const AuthPage = () => {
               ))}
             </ul>
           </div>
-          
+
           {/* Animated Background Elements */}
           <div className="absolute inset-0 overflow-hidden">
             <div className="absolute -top-20 -left-20 w-40 h-40 bg-white/10 rounded-full blur-xl" />
@@ -51,7 +55,7 @@ export const AuthPage = () => {
         >
           <div className="max-w-md w-full space-y-8">
             {/* Logo & Heading */}
-            <motion.div 
+            <motion.div
               animate={{ y: [-5, 5, -5] }}
               transition={{ duration: 4, repeat: Infinity }}
               className="flex flex-col items-center"
@@ -62,7 +66,9 @@ export const AuthPage = () => {
               <h1 className="text-4xl font-bold bg-gradient-to-r from-violet-400 to-purple-300 bg-clip-text text-transparent">
                 NotiFy
               </h1>
-              <p className="text-gray-400 mt-2">Your Smarter Note-Taking Space</p>
+              <p className="text-gray-400 mt-2">
+                Your Smarter Note-Taking Space
+              </p>
             </motion.div>
 
             {/* Auth Button */}
@@ -84,14 +90,16 @@ export const AuthPage = () => {
                 <div className="w-full border-t border-white/10"></div>
               </div>
               <div className="relative flex justify-center text-sm">
-                <span className="px-2 bg-gray-900/80 text-gray-400">Secure Login</span>
+                <span className="px-2 bg-gray-900/80 text-gray-400">
+                  Secure Login
+                </span>
               </div>
             </div>
 
             {/* Features Grid */}
             <div className="grid grid-cols-3 gap-4 text-center">
-              {['🔒 Secure', '🚀 Fast', '✨ Modern'].map((feature) => (
-                <div 
+              {["🔒 Secure", "🚀 Fast", "✨ Modern"].map((feature) => (
+                <div
                   key={feature}
                   className="p-3 bg-gray-800 rounded-lg border border-white/10 shadow-sm"
                 >

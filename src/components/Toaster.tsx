@@ -58,7 +58,9 @@ const Toaster: React.FC = () => {
     <div className="fixed top-4 right-4 z-[9999] space-y-3 w-[320px]">
       <AnimatePresence>
         {toasts.map((toast: Toast) => {
-          const { icon, border, background, text, progress } = getToastConfig(toast.type);
+          const { icon, border, background, text, progress } = getToastConfig(
+            toast.type
+          );
 
           return (
             <motion.div
@@ -81,7 +83,9 @@ const Toaster: React.FC = () => {
 
               <div className="flex items-start gap-3">
                 <span className="shrink-0">{icon}</span>
-                <p className={`text-sm font-medium ${text} leading-5`}>{toast.message}</p>
+                <p className={`text-sm font-medium ${text} leading-5`}>
+                  {toast.message}
+                </p>
               </div>
 
               <button

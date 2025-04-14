@@ -54,7 +54,7 @@ export default function NoteModal({
           <DialogTitle className="text-2xl font-bold mb-4 text-violet-700">
             {initialTitle ? "Edit Note" : "New Note"}
           </DialogTitle>
-          
+
           <input
             type="text"
             className="w-full px-4 py-2 mb-4 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-violet-400"
@@ -94,8 +94,10 @@ type MenuBarProps = {
 const MenuBar = ({ editor }: MenuBarProps) => {
   if (!editor) return null;
 
-  const buttonClass = (active: boolean) => 
-    `p-2 hover:bg-violet-100 rounded ${active ? "text-violet-700" : "text-gray-600"}`;
+  const buttonClass = (active: boolean) =>
+    `p-2 hover:bg-violet-100 rounded ${
+      active ? "text-violet-700" : "text-gray-600"
+    }`;
 
   return (
     <div className="flex gap-1 p-2 border-b border-gray-200">
