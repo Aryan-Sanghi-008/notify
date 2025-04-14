@@ -1,4 +1,7 @@
 import { useState, useEffect } from "react";
+import { useEditor, EditorContent } from "@tiptap/react";
+import StarterKit from "@tiptap/starter-kit";
+import Underline from "@tiptap/extension-underline";
 import { Dialog, DialogPanel, DialogTitle } from "@headlessui/react";
 import Button from "./Button";
 
@@ -20,17 +23,28 @@ export default function NoteModal({
   const [title, setTitle] = useState(initialTitle);
   const [content, setContent] = useState(initialContent);
 
+  const editor = useEditor({
+    extensions: [StarterKit, Underline],
+    content: initialContent,
+    onUpdate: ({ editor }) => {
+      setContent(editor.getHTML());
+    },
+  });
+
   useEffect(() => {
     setTitle(initialTitle);
     setContent(initialContent);
+    editor?.commands.setContent(initialContent);
   }, [initialTitle, initialContent, isOpen]);
 
   const handleSubmit = () => {
     onSave(title, content);
     setTitle("");
-    setContent("");
+    editor?.commands.clearContent();
     onClose();
   };
+
+  if (!editor) return null;
 
   return (
     <Dialog open={isOpen} onClose={onClose} className="relative z-50">
@@ -40,6 +54,7 @@ export default function NoteModal({
           <DialogTitle className="text-2xl font-bold mb-4 text-violet-700">
             {initialTitle ? "Edit Note" : "New Note"}
           </DialogTitle>
+          
           <input
             type="text"
             className="w-full px-4 py-2 mb-4 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-violet-400"
@@ -47,13 +62,15 @@ export default function NoteModal({
             value={title}
             onChange={(e) => setTitle(e.target.value)}
           />
-          <textarea
-            value={content}
-            onChange={(e) => setContent(e.target.value)}
-            className="w-full px-4 py-2 mb-4 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-violet-400"
-            rows={8}
-            placeholder="Write your note..."
-          />
+
+          <div className="mb-4 border border-gray-300 rounded focus-within:ring-2 focus-within:ring-violet-400">
+            <MenuBar editor={editor} />
+            <EditorContent
+              editor={editor}
+              className="min-h-[200px] p-4 focus:outline-none prose prose-sm max-w-none"
+            />
+          </div>
+
           <div className="flex justify-end gap-2">
             <Button
               variant="ghost"
@@ -69,3 +86,56 @@ export default function NoteModal({
     </Dialog>
   );
 }
+
+type MenuBarProps = {
+  editor: ReturnType<typeof useEditor>;
+};
+
+const MenuBar = ({ editor }: MenuBarProps) => {
+  if (!editor) return null;
+
+  const buttonClass = (active: boolean) => 
+    `p-2 hover:bg-violet-100 rounded ${active ? "text-violet-700" : "text-gray-600"}`;
+
+  return (
+    <div className="flex gap-1 p-2 border-b border-gray-200">
+      <button
+        type="button"
+        onClick={() => editor.chain().focus().toggleBold().run()}
+        disabled={!editor.can().chain().focus().toggleBold().run()}
+        className={buttonClass(editor.isActive("bold"))}
+      >
+        B
+      </button>
+      <button
+        type="button"
+        onClick={() => editor.chain().focus().toggleItalic().run()}
+        disabled={!editor.can().chain().focus().toggleItalic().run()}
+        className={buttonClass(editor.isActive("italic"))}
+      >
+        I
+      </button>
+      <button
+        type="button"
+        onClick={() => editor.chain().focus().toggleUnderline().run()}
+        className={buttonClass(editor.isActive("underline"))}
+      >
+        U
+      </button>
+      <button
+        type="button"
+        onClick={() => editor.chain().focus().toggleBulletList().run()}
+        className={buttonClass(editor.isActive("bulletList"))}
+      >
+        • List
+      </button>
+      <button
+        type="button"
+        onClick={() => editor.chain().focus().toggleOrderedList().run()}
+        className={buttonClass(editor.isActive("orderedList"))}
+      >
+        1. List
+      </button>
+    </div>
+  );
+};

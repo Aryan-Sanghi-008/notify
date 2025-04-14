@@ -17,3 +17,26 @@
 .custom-scrollbar::-webkit-scrollbar-thumb:hover {
   background: #555;
 }
+
+
+.ProseMirror {
+  min-height: 200px;
+  outline: none;
+}
+
+.ProseMirror ul, 
+.ProseMirror ol {
+  padding-left: 1.5rem;
+}
+
+.ProseMirror ul {
+  list-style-type: disc;
+}
+
+.ProseMirror ol {
+  list-style-type: decimal;
+}
+
+.ProseMirror u {
+  text-decoration: underline;
+}
