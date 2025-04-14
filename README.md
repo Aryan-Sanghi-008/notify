@@ -34,7 +34,7 @@ NotiFy is a personalized notes application built using **React**, **TypeScript**
 ### 1. Clone the Repository
 
 ```bash
-git clone https://github.com/Aryan-Sanghi-008/StickyFy.git
+git clone https://github.com/Aryan-Sanghi-008/notify.git
 cd notify
 ```
 
