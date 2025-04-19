@@ -89,7 +89,7 @@ export const RecycleBin = () => {
           {softDeleteNotes.map((note) => (
             <motion.div
               key={note.id}
-              whileHover={{ scale: 1.02 }}
+              whileHover={{ scale: 1.05 }}
               className="relative bg-white rounded-xl shadow-sm hover:shadow-md transition-shadow border border-gray-100"
             >
               <div
