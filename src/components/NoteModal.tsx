@@ -60,17 +60,6 @@ export default function NoteModal({
     },
   });
 
-  useEffect(() => {
-    if (!isOpen) return;
-    setTitle(initialTitle);
-    setContent(initialContent);
-    setPhoto(initialPhoto);
-    setTags(initialTags);
-    setColor(initialColor);
-    setReminder(initialReminder);
-    editor?.commands.setContent(initialContent);
-  }, [isOpen]);
-
   const handleAddTag = () => {
     if (tagInput.trim() && !tags.includes(tagInput.trim())) {
       setTags([...tags, tagInput.trim()]);
@@ -92,40 +81,69 @@ export default function NoteModal({
     onClose();
   };
 
+  const getTextColor = (backgroundColor: string) => {
+    const color = backgroundColor.replace("#", "");
+    const rgb = parseInt(color, 16);
+    const r = (rgb >> 16) & 0xff;
+    const g = (rgb >> 8) & 0xff;
+    const b = (rgb >> 0) & 0xff;
+    const luminance = 0.2126 * r + 0.7152 * g + 0.0722 * b;
+    return luminance > 160 ? "text-gray-900" : "text-gray-100";
+  };
+
   if (!editor) return null;
+  const textColor = getTextColor(color);
+
+  useEffect(() => {
+    if (!isOpen) return;
+    setTitle(initialTitle);
+    setContent(initialContent);
+    setPhoto(initialPhoto);
+    setTags(initialTags);
+    setColor(initialColor);
+    setReminder(initialReminder);
+    editor?.commands.setContent(initialContent);
+  }, [isOpen]);
 
   return (
     <Dialog open={isOpen} onClose={onClose} className="relative z-50">
-      <div
-        className="fixed inset-0 bg-black/30 backdrop-blur-sm"
-        aria-hidden="true"
-      />
       <div className="fixed inset-0 flex items-center justify-center p-4">
         <DialogPanel
-          className="w-full max-w-2xl rounded-xl bg-white p-6 shadow-2xl max-h-[90vh] overflow-y-auto"
+          className={`w-full max-w-2xl rounded-xl p-6 shadow-2xl max-h-[90vh] overflow-y-auto transition-colors duration-300 ${
+            color === "#ffffff" ? "border border-gray-200" : ""
+          }`}
           style={{ backgroundColor: color }}
         >
           <div className="flex justify-between items-start mb-6">
-            <DialogTitle className="text-2xl font-bold text-gray-800">
+            <DialogTitle className={`text-2xl font-bold ${textColor}`}>
               {initialTitle ? "Edit Note" : "New Note"}
             </DialogTitle>
             <button
               onClick={onClose}
-              className="p-1.5 hover:bg-gray-100 rounded-full transition-colors"
+              className={`p-1.5 rounded-full transition-colors ${
+                textColor === "text-gray-900"
+                  ? "hover:bg-gray-100/80"
+                  : "hover:bg-gray-900/10"
+              }`}
             >
-              <X size={24} className="text-gray-500" />
+              <X size={24} className={textColor} />
             </button>
           </div>
 
           <div className="space-y-6">
             <input
               type="text"
-              className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-lg font-medium placeholder-gray-400"
+              className={`w-full px-4 py-3 rounded-lg focus:ring-2 focus:border-transparent text-lg font-medium placeholder-gray-400 transition-colors ${
+                textColor === "text-gray-900"
+                  ? "border border-gray-200/80 bg-white/90 focus:ring-blue-600"
+                  : "border border-gray-100/20 bg-white/20 focus:ring-white"
+              }`}
               placeholder="Note title..."
               value={title}
               onChange={(e) => setTitle(e.target.value)}
             />
 
+            {/* Updated DatePicker styling */}
             <div className="flex gap-3 items-center">
               <ColorPicker value={color} onChange={setColor} />
               <div className="flex-1">
@@ -133,18 +151,33 @@ export default function NoteModal({
                   selected={reminder}
                   onChange={(date: Date | null) => setReminder(date)}
                   placeholderText="Set reminder"
-                  className="w-full px-4 py-2.5 text-sm border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  className={`w-full px-4 py-2.5 text-sm rounded-lg focus:ring-2 focus:border-transparent ${
+                    textColor === "text-gray-900"
+                      ? "border border-gray-200/80 bg-white/90 focus:ring-blue-600"
+                      : "border border-gray-100/20 bg-white/20 focus:ring-white"
+                  }`}
                   showTimeSelect
                   dateFormat="MMMM d, yyyy h:mm aa"
-                  popperClassName="!py-3 rounded-xl shadow-xl [&_.react-datepicker__time-container]:!rounded-r-xl [&_.react-datepicker__header]:!bg-gray-50"
+                  popperClassName={`!py-3 rounded-xl shadow-xl ${
+                    textColor === "text-gray-900"
+                      ? "[&_.react-datepicker__header]:!bg-gray-50"
+                      : "[&_.react-datepicker__header]:!bg-gray-800"
+                  }`}
                   timeClassName={() => "!text-sm"}
                   wrapperClassName="w-full"
                 />
               </div>
             </div>
 
+            {/* Image container styling */}
             {photo && (
-              <div className="relative group rounded-xl overflow-hidden border border-gray-200 shadow-sm">
+              <div
+                className={`relative group rounded-xl overflow-hidden shadow-sm ${
+                  textColor === "text-gray-900"
+                    ? "border border-gray-200/80"
+                    : "border border-gray-100/20"
+                }`}
+              >
                 <img
                   src={photo}
                   alt="Note preview"
@@ -153,40 +186,70 @@ export default function NoteModal({
                 <button
                   type="button"
                   onClick={() => setPhoto("")}
-                  className="absolute top-3 right-3 bg-white/90 hover:bg-white text-gray-600 rounded-full p-1.5 shadow-sm transition-all"
+                  className={`absolute top-3 right-3 rounded-full p-1.5 shadow-sm transition-all ${
+                    textColor === "text-gray-900"
+                      ? "bg-white/90 hover:bg-white text-gray-600"
+                      : "bg-gray-900/20 hover:bg-gray-900/30 text-gray-100"
+                  }`}
                 >
                   <X size={18} />
                 </button>
               </div>
             )}
 
-            <div className="border border-gray-200 rounded-xl focus-within:ring-2 focus-within:ring-blue-500">
-              <div className="p-2 border-b border-gray-200 bg-gray-50 rounded-t-xl">
-                <MenuBar editor={editor} />
+            {/* Editor styling */}
+            <div
+              className={`rounded-xl focus-within:ring-2 ${
+                textColor === "text-gray-900"
+                  ? "border border-gray-200/80 focus-within:ring-blue-600"
+                  : "border border-gray-100/20 focus-within:ring-white"
+              }`}
+            >
+              <div
+                className={`p-2 border-b rounded-t-xl ${
+                  textColor === "text-gray-900"
+                    ? "border-gray-200/80 bg-gray-50/90"
+                    : "border-gray-100/20 bg-gray-900/10"
+                }`}
+              >
+                <MenuBar editor={editor} textColor={textColor} />
               </div>
               <div className="p-4">
                 <EditorContent
                   editor={editor}
-                  className="min-h-[200px] focus:outline-none prose prose-sm max-w-none text-gray-700"
+                  className={`min-h-[200px] focus:outline-none prose prose-sm max-w-none ${
+                    textColor === "text-gray-900"
+                      ? "text-gray-700"
+                      : "text-gray-200"
+                  }`}
                 />
               </div>
             </div>
 
+            {/* Tags input styling */}
             <div className="space-y-3">
               <div className="flex gap-2 items-center">
-                <FaTag className="text-gray-500 flex-shrink-0" />
+                <FaTag className={`${textColor} flex-shrink-0`} />
                 <input
                   type="text"
                   value={tagInput}
                   onChange={(e) => setTagInput(e.target.value)}
                   onKeyPress={(e) => e.key === "Enter" && handleAddTag()}
                   placeholder="Add tags..."
-                  className="px-4 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent flex-1 text-sm"
+                  className={`px-4 py-2 rounded-lg focus:ring-2 focus:border-transparent flex-1 text-sm ${
+                    textColor === "text-gray-900"
+                      ? "border border-gray-200/80 bg-white/90 focus:ring-blue-600"
+                      : "border border-gray-100/20 bg-white/20 focus:ring-white"
+                  }`}
                 />
                 <Button
                   size="sm"
                   onClick={handleAddTag}
-                  className="bg-blue-50 text-blue-600 hover:bg-blue-100"
+                  className={`${
+                    textColor === "text-gray-900"
+                      ? "bg-blue-50 text-blue-600 hover:bg-blue-100"
+                      : "bg-gray-100/20 text-gray-100 hover:bg-gray-100/30"
+                  }`}
                 >
                   Add
                 </Button>
@@ -195,13 +258,21 @@ export default function NoteModal({
                 {tags.map((tag) => (
                   <span
                     key={tag}
-                    className="px-3 py-1.5 bg-blue-50 text-blue-700 rounded-full text-sm font-medium flex items-center gap-2"
+                    className={`px-3 py-1.5 rounded-full text-sm font-medium flex items-center gap-2 ${
+                      textColor === "text-gray-900"
+                        ? "bg-blue-50 text-blue-700"
+                        : "bg-gray-100/20 text-gray-100"
+                    }`}
                   >
                     #{tag}
                     <button
                       type="button"
                       onClick={() => handleRemoveTag(tag)}
-                      className="text-blue-500 hover:text-blue-700"
+                      className={`${
+                        textColor === "text-gray-900"
+                          ? "text-blue-500 hover:text-blue-700"
+                          : "text-gray-300 hover:text-gray-100"
+                      }`}
                     >
                       <X size={14} />
                     </button>
@@ -211,17 +282,32 @@ export default function NoteModal({
             </div>
           </div>
 
-          <div className="flex justify-end gap-3 mt-8 border-t border-gray-100 pt-6">
+          {/* Footer buttons */}
+          <div
+            className={`flex justify-end gap-3 mt-8 border-t pt-6 ${
+              textColor === "text-gray-900"
+                ? "border-gray-200/80"
+                : "border-gray-100/20"
+            }`}
+          >
             <Button
               variant="ghost"
               onClick={onClose}
-              className="text-gray-600 hover:bg-gray-50"
+              className={`${
+                textColor === "text-gray-900"
+                  ? "text-gray-600 hover:bg-gray-100"
+                  : "text-gray-200 hover:bg-gray-100/20"
+              }`}
             >
               Cancel
             </Button>
             <Button
               onClick={handleSubmit}
-              className="bg-blue-600 hover:bg-blue-700 text-white shadow-sm"
+              className={`${
+                textColor === "text-gray-900"
+                  ? "bg-blue-600 hover:bg-blue-700 text-white"
+                  : "bg-gray-100 hover:bg-gray-200 text-gray-900"
+              } shadow-sm`}
             >
               Save Note
             </Button>

@@ -124,26 +124,6 @@ const NotesPage = () => {
     fetchNotes();
   };
 
-  //TODO : will add filter functionality soon
-  // const filterBy = (period: "all" | "week" | "month") => {
-  //   const now = new Date();
-  //   let result = notes;
-
-  //   if (period === "week") {
-  //     result = notes.filter((note) => {
-  //       const createdAt = note.createdAt.toDate();
-  //       return now.getTime() - createdAt.getTime() < 7 * 24 * 60 * 60 * 1000;
-  //     });
-  //   } else if (period === "month") {
-  //     result = notes.filter((note) => {
-  //       const createdAt = note.createdAt.toDate();
-  //       return now.getMonth() === createdAt.getMonth();
-  //     });
-  //   }
-
-  //   setFilteredNotes(result);
-  // };
-
   useEffect(() => {
     fetchNotes();
   }, [user]);
