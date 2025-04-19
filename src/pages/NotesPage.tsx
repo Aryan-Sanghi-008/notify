@@ -5,8 +5,8 @@ import { Note } from "../types/Note";
 import Button from "../components/Button";
 import {
   createNote,
-  deleteNote,
   getUserNotes,
+  softDeleteNote,
   updateNote,
 } from "../lib/firebase/notes";
 import { useAuth } from "../hooks/useAuth";
@@ -42,7 +42,7 @@ const NotesPage = () => {
 
   const confirmDelete = async () => {
     if (!noteToDelete) return;
-    await deleteNote(noteToDelete.id);
+    await softDeleteNote(noteToDelete.id);
     dispatch(
       addToast({
         message: "Note deleted successfully",
@@ -205,7 +205,7 @@ const NotesPage = () => {
           isOpen={warningOpen}
           onConfirm={confirmDelete}
           onCancel={() => setWarningOpen(false)}
-          message="Are you sure you want to delete this note? This action cannot be undone."
+          message="Are you sure you want to delete this note?, Well..., you can restore this note from recycle bin."
         />
 
         <NoteViewerModal

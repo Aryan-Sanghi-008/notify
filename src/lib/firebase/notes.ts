@@ -39,12 +39,18 @@ export const createNote = async (note: {
     reminder: note.reminder ?? null,
     createdAt: now,
     updatedAt: now,
+    deleteMode: "notDeleted",
+    deletedAt: null,
   });
 };
 
 // READ: Count
 export const getUserNotesCount = async (userId: string): Promise<number> => {
-  const q = query(collection(db, "notes"), where("userId", "==", userId));
+  const q = query(
+    collection(db, "notes"),
+    where("userId", "==", userId),
+    where("deleteMode", "==", "notDeleted")
+  );
   const querySnapshot = await getDocs(q);
   return querySnapshot.size;
 };
@@ -56,6 +62,7 @@ export const getLastCreatedNote = async (
   const q = query(
     collection(db, "notes"),
     where("userId", "==", userId),
+    where("deleteMode", "==", "notDeleted"),
     orderBy("createdAt", "desc"),
     limit(1)
   );
@@ -84,6 +91,8 @@ const parseNote = (doc: any): Note => {
     createdAt: data.createdAt,
     updatedAt: data.updatedAt,
     attachments: data.attachments || [],
+    deleteMode: data.deleteMode || "notDeleted",
+    deletedAt: data.deletedAt || null,
   };
 };
 
@@ -92,6 +101,7 @@ export const getRecentNotes = async (userId: string): Promise<Note[]> => {
   const q = query(
     collection(db, "notes"),
     where("userId", "==", userId),
+    where("deleteMode", "==", "notDeleted"),
     orderBy("isPinned", "desc"),
     orderBy("createdAt", "desc"),
     limit(10)
@@ -103,7 +113,22 @@ export const getRecentNotes = async (userId: string): Promise<Note[]> => {
 
 // READ: All Notes
 export const getUserNotes = async (userId: string): Promise<Note[]> => {
-  const q = query(collection(db, "notes"), where("userId", "==", userId));
+  const q = query(
+    collection(db, "notes"),
+    where("userId", "==", userId),
+    where("deleteMode", "==", "notDeleted")
+  );
+  const querySnapshot = await getDocs(q);
+  return querySnapshot.docs.map((doc) => parseNote(doc)) as Note[];
+};
+
+// READ : Fetch Soft Delete Notes
+export const fetchSoftDeleteNotes = async (userId: string): Promise<Note[]> => {
+  const q = query(
+    collection(db, "notes"),
+    where("userId", "==", userId),
+    where("deleteMode", "==", "soft")
+  );
   const querySnapshot = await getDocs(q);
   return querySnapshot.docs.map((doc) => parseNote(doc)) as Note[];
 };
@@ -129,7 +154,27 @@ export const updateNote = async (
   });
 };
 
-// DELETE
+// UPDATE (Restore note)
+export const restoreNote = async (id: string): Promise<void> => {
+  const noteRef = doc(db, "notes", id);
+  await updateDoc(noteRef, {
+    deleteMode: "notDeleted",
+    deletedAt: null,
+    updatedAt: Timestamp.now(),
+  });
+};
+
+// DELETE (Soft delete)
+export const softDeleteNote = async (id: string): Promise<void> => {
+  const noteRef = doc(db, "notes", id);
+  await updateDoc(noteRef, {
+    deleteMode: "soft",
+    deletedAt: Timestamp.now(),
+    updatedAt: Timestamp.now(),
+  });
+};
+
+// DELETE (hard delete)
 export const deleteNote = async (id: string): Promise<void> => {
   const noteRef = doc(db, "notes", id);
   await deleteDoc(noteRef);

@@ -5,6 +5,7 @@ import { AuthPage } from "./pages/AuthPage";
 import { useAuth } from "./hooks/useAuth";
 import NotesPage from "./pages/NotesPage";
 import AppLayout from "./layouts/AppLayout";
+import { RecycleBin } from "./pages/RecycleBin";
 
 const AppRoutes = () => {
   const { user } = useAuth();
@@ -38,6 +39,14 @@ const AppRoutes = () => {
         element={
           <AppLayout>
             <NotesPage />
+          </AppLayout>
+        }
+      />
+      <Route
+        path="/bin"
+        element={
+          <AppLayout>
+            <RecycleBin />
           </AppLayout>
         }
       />

@@ -10,6 +10,7 @@ import {
 } from "react-icons/fa";
 import Button from "./Button";
 import { GiNotebook } from "react-icons/gi";
+import { IoTrashBin } from "react-icons/io5";
 
 const Sidebar = () => {
   const navigate = useNavigate();
@@ -19,6 +20,7 @@ const Sidebar = () => {
   const navItems = [
     { label: "Dashboard", icon: <FaTachometerAlt />, path: "/dashboard" },
     { label: "Notes", icon: <FaStickyNote />, path: "/notes" },
+    { label : "Bin", icon: <IoTrashBin />, path: "/bin"    }
   ];
 
   return (

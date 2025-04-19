@@ -15,4 +15,6 @@ export type Note = {
   reminder?: Date | null;
   attachments?: string[];
   userId: string;
+  deletedAt?: Timestamp | null;
+  deleteMode?: "notDeleted" | "soft"
 };
