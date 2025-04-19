@@ -5,12 +5,14 @@ export type Note = {
   id: string;
   title: string;
   content: string;
+  photoURL?: string;
+  tags?: string[];
+  isPinned: boolean;
+  isFavorite: boolean;
+  color?: string;
   createdAt: Timestamp;
   updatedAt: Timestamp;
-  user: {
-    id: string;
-    name: string;
-    email: string;
-  };
+  reminder?: Timestamp;
+  attachments?: string[];
   userId: string;
 };

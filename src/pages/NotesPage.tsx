@@ -12,11 +12,11 @@ import {
 import { useAuth } from "../hooks/useAuth";
 import NoteCard from "../components/NoteCard";
 import WarningModal from "../components/WarningModal";
-import NoteViewerModal from "../components/NoteViewerModal";
 import { useDispatch } from "react-redux";
 import { addToast } from "../store/slices/toastSlice";
 import { v4 as uuidv4 } from "uuid";
 import { FaStickyNote } from "react-icons/fa";
+import { NoteViewerModal } from "../components/NoteViewerModal";
 
 const NotesPage = () => {
   const dispatch = useDispatch();
@@ -62,11 +62,25 @@ const NotesPage = () => {
     setFilteredNotes(userNotes);
   };
 
-  const handleSaveNote = async (title: string, content: string) => {
+  const handleSaveNote = async (
+    title: string,
+    content: string,
+    additionalData?: {
+      photoURL?: string;
+      tags?: string[];
+      color?: string;
+      reminder?: Date | null;
+    }
+  ) => {
     if (!user) return;
 
     if (editingNote) {
-      await updateNote({ id: editingNote.id, title, content });
+      await updateNote(editingNote.id, {
+        title,
+        content,
+        photoURL: additionalData?.photoURL || null, 
+        ...additionalData,
+      });
       dispatch(
         addToast({
           message: "Note updated successfully",
@@ -76,7 +90,12 @@ const NotesPage = () => {
       );
       setEditingNote(null);
     } else {
-      await createNote({ title, content, userId: user.uid });
+      await createNote({
+        title,
+        content,
+        userId: user.uid,
+        ...additionalData,
+      });
       dispatch(
         addToast({
           message: "Note created successfully",
@@ -87,12 +106,22 @@ const NotesPage = () => {
     }
 
     setModalOpen(false);
-    fetchNotes(); // refresh list
+    fetchNotes();
   };
 
   const handleEditNote = (note: Note) => {
     setEditingNote(note);
     setModalOpen(true);
+  };
+
+  const handleToggleFavorite = async (note: Note) => {
+    await updateNote(note.id, { isFavorite: !note.isFavorite });
+    fetchNotes();
+  };
+
+  const handleTogglePin = async (note: Note) => {
+    await updateNote(note.id, { isPinned: !note.isPinned });
+    fetchNotes();
   };
 
   //TODO : will add filter functionality soon
@@ -150,6 +179,8 @@ const NotesPage = () => {
               onEdit={handleEditNote}
               onDelete={handleRequestDelete}
               onView={handleViewNote}
+              onToggleFavorite={handleToggleFavorite}
+              onTogglePin={handleTogglePin}
             />
           ))}
         </div>

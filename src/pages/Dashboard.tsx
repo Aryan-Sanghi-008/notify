@@ -11,8 +11,8 @@ import { useEffect, useState } from "react";
 import { getRecentNotes, getUserNotesCount } from "../lib/firebase/notes";
 import { Note } from "../types/Note";
 import Button from "../components/Button";
-import NoteViewerModal from "../components/NoteViewerModal";
 import { getNoteEmoji, timeSince } from "../utils/helperFunctions";
+import { NoteViewerModal } from "../components/NoteViewerModal";
 
 const Dashboard = () => {
   const { user } = useAuth();
