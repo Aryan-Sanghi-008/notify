@@ -5,13 +5,12 @@ import StarterKit from "@tiptap/starter-kit";
 import Underline from "@tiptap/extension-underline";
 import { Dialog, DialogPanel, DialogTitle } from "@headlessui/react";
 import Button from "./Button";
-import { ColorPicker } from "./ColorPicker";
 import { FaTag } from "react-icons/fa";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
+import { X } from "lucide-react";
 import MenuBar from "./MenuBar";
-import { ImageIcon, X } from "lucide-react";
-import { getStorage, ref, uploadBytes, getDownloadURL } from "firebase/storage";
+import ColorPicker from "./ColorPicker";
 
 type NoteModalProps = {
   isOpen: boolean;
@@ -45,8 +44,6 @@ export default function NoteModal({
   initialColor = "#ffffff",
   initialReminder = null,
 }: NoteModalProps) {
-  const storage = getStorage();
-
   const [title, setTitle] = useState(initialTitle);
   const [content, setContent] = useState(initialContent);
   const [photo, setPhoto] = useState(initialPhoto);
@@ -93,31 +90,6 @@ export default function NoteModal({
       reminder,
     });
     onClose();
-  };
-
-  const handleImageUpload = async (file: File) => {
-    try {
-      // Add file validation
-      if (!file.type.startsWith("image/")) {
-        alert("Please upload an image file");
-        return;
-      }
-
-      if (file.size > 5 * 1024 * 1024) {
-        // 5MB limit
-        alert("File size exceeds 5MB limit");
-        return;
-      }
-
-      const storageRef = ref(storage, `notes/${Date.now()}_${file.name}`);
-      const snapshot = await uploadBytes(storageRef, file);
-      const url = await getDownloadURL(snapshot.ref);
-
-      setPhoto(url);
-    } catch (error) {
-      console.error("Upload failed:", error);
-      alert("Image upload failed. Please try again.");
-    }
   };
 
   if (!editor) return null;
@@ -197,30 +169,6 @@ export default function NoteModal({
                   editor={editor}
                   className="min-h-[200px] focus:outline-none prose prose-sm max-w-none text-gray-700"
                 />
-              </div>
-            </div>
-
-            <div className="space-y-3">
-              <div className="flex gap-2 items-center">
-                <label className="flex items-center gap-3 cursor-pointer">
-                  <input
-                    type="file"
-                    accept="image/*"
-                    onChange={(e) => {
-                      const file = e.target.files?.[0];
-                      if (file) {
-                        handleImageUpload(file); // Use storage upload instead of FileReader
-                      }
-                    }}
-                    className="hidden"
-                  />
-                  <div className="p-2.5 rounded-lg bg-blue-50 text-blue-600 hover:bg-blue-100 transition-colors">
-                    <ImageIcon size={20} />
-                  </div>
-                  <span className="text-gray-600 hover:text-gray-800 transition-colors text-sm font-medium">
-                    {photo ? "Change Image" : "Upload Image"}
-                  </span>
-                </label>
               </div>
             </div>
 

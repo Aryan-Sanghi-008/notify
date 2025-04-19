@@ -78,7 +78,7 @@ const NotesPage = () => {
       await updateNote(editingNote.id, {
         title,
         content,
-        photoURL: additionalData?.photoURL || null, 
+        photoURL: additionalData?.photoURL || null,
         ...additionalData,
       });
       dispatch(
@@ -216,6 +216,9 @@ const NotesPage = () => {
           onSave={handleSaveNote}
           initialTitle={editingNote?.title || ""}
           initialContent={editingNote?.content || ""}
+          initialTags={editingNote?.tags}
+          initialColor={editingNote?.color}
+          initialReminder={editingNote?.reminder?.toDate()}
         />
 
         <WarningModal
