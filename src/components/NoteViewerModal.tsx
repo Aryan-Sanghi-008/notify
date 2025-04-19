@@ -12,13 +12,20 @@ type Props = {
 };
 
 export const NoteViewerModal = ({ isOpen, note, onClose }: Props) => {
+  const safeFormat = (date: Date, formatStr: string) => {
+    const parsedDate = date instanceof Date ? date : new Date(date);
+    return isNaN(parsedDate.getTime())
+      ? "Invalid date"
+      : format(parsedDate, formatStr);
+  };
+
   return (
     <Dialog open={isOpen} onClose={onClose} className="relative z-50">
       <div className="fixed inset-0 bg-black/30" aria-hidden="true" />
       <div className="fixed inset-0 flex items-center justify-center p-4">
-        <DialogPanel 
+        <DialogPanel
           className="max-w-2xl w-full rounded-2xl bg-white p-6 shadow-xl"
-          style={{ backgroundColor: note?.color || '#fff' }}
+          style={{ backgroundColor: note?.color || "#fff" }}
         >
           {note && (
             <>
@@ -27,16 +34,16 @@ export const NoteViewerModal = ({ isOpen, note, onClose }: Props) => {
               </DialogTitle>
 
               {note.photoURL && (
-                <img 
-                  src={note.photoURL} 
-                  alt="Note visual" 
-                  className="rounded-lg mb-4 w-full h-48 object-cover" 
+                <img
+                  src={note.photoURL}
+                  alt="Note visual"
+                  className="rounded-lg mb-4 w-full h-48 object-cover"
                 />
               )}
 
               {note.tags && note.tags?.length > 0 && (
                 <div className="flex flex-wrap gap-2 mb-4">
-                  {note.tags.map(tag => (
+                  {note.tags.map((tag) => (
                     <span
                       key={tag}
                       className="px-2 py-1 bg-violet-100 text-violet-700 rounded-full text-sm flex items-center gap-1"
@@ -58,7 +65,7 @@ export const NoteViewerModal = ({ isOpen, note, onClose }: Props) => {
                   {note.reminder && (
                     <p className="flex items-center gap-2 text-amber-600">
                       <FaBell />
-                      Reminder: {format(note.reminder.toDate(), "PPpp")}
+                      Reminder: {safeFormat(note.reminder, "PPpp")}
                     </p>
                   )}
                 </div>

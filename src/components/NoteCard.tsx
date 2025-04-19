@@ -157,7 +157,7 @@ const NoteCard: React.FC<NoteCardProps> = ({
             <div className="flex items-center gap-1.5 text-gray-600">
               <Bell size={14} className="flex-shrink-0" />
               <span className="font-medium">
-                {format(note.reminder.toDate(), "dd MMM, HH:mm")}
+                {format(note.reminder, "dd MMM, HH:mm")}
               </span>
             </div>
           )}

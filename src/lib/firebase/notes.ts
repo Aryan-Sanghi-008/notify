@@ -36,7 +36,7 @@ export const createNote = async (note: {
     color: note.color || "#ffffff",
     isPinned: note.isPinned || false,
     isFavorite: note.isFavorite || false,
-    reminder: note.reminder ? Timestamp.fromDate(note.reminder) : null,
+    reminder: note.reminder ?? null,
     createdAt: now,
     updatedAt: now,
   });
@@ -80,7 +80,7 @@ const parseNote = (doc: any): Note => {
     color: data.color || "#ffffff",
     isPinned: data.isPinned || false,
     isFavorite: data.isFavorite || false,
-    reminder: data.reminder?.toDate(),
+    reminder: data?.reminder ? data.reminder?.toDate() : null,
     createdAt: data.createdAt,
     updatedAt: data.updatedAt,
     attachments: data.attachments || [],
@@ -100,14 +100,12 @@ export const getRecentNotes = async (userId: string): Promise<Note[]> => {
   const querySnapshot = await getDocs(q);
   return querySnapshot.docs.map((doc) => parseNote(doc)) as Note[];
 };
+
 // READ: All Notes
 export const getUserNotes = async (userId: string): Promise<Note[]> => {
   const q = query(collection(db, "notes"), where("userId", "==", userId));
   const querySnapshot = await getDocs(q);
-  return querySnapshot.docs.map((doc) => ({
-    id: doc.id,
-    ...doc.data(),
-  })) as Note[];
+  return querySnapshot.docs.map((doc) => parseNote(doc)) as Note[];
 };
 
 // UPDATE
@@ -127,9 +125,6 @@ export const updateNote = async (
   const noteRef = doc(db, "notes", id);
   await updateDoc(noteRef, {
     ...updateData,
-    reminder: updateData.reminder
-      ? Timestamp.fromDate(updateData.reminder)
-      : null,
     updatedAt: Timestamp.now(),
   });
 };

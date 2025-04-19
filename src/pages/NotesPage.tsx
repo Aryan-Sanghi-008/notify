@@ -198,7 +198,7 @@ const NotesPage = () => {
           initialContent={editingNote?.content || ""}
           initialTags={editingNote?.tags}
           initialColor={editingNote?.color}
-          initialReminder={editingNote?.reminder?.toDate()}
+          initialReminder={editingNote?.reminder}
         />
 
         <WarningModal

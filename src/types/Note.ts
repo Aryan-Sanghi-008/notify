@@ -12,7 +12,7 @@ export type Note = {
   color?: string;
   createdAt: Timestamp;
   updatedAt: Timestamp;
-  reminder?: Timestamp;
+  reminder?: Date | null;
   attachments?: string[];
   userId: string;
 };
