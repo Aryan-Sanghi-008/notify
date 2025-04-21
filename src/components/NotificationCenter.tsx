@@ -1,5 +1,5 @@
 // components/NotificationCenter.tsx
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { shallowEqual, useDispatch, useSelector } from "react-redux";
 import { RootState } from "../store/store";
 import { motion, AnimatePresence } from "framer-motion";
@@ -45,6 +45,7 @@ interface NotifactionItemProps {
 
 const NotificationCenter = () => {
   const [isOpen, setIsOpen] = useState(false);
+  const notificationRef = useRef<HTMLDivElement>(null);
   const dispatch = useDispatch();
   const selectSortedNotifications = createSelector(
     [(state: RootState) => state.notifications.notifications],
@@ -60,9 +61,26 @@ const NotificationCenter = () => {
   const unreadNotifications = notifications.filter((n) => !n.read);
   const readNotifications = notifications.filter((n) => n.read);
 
+  // Handle outside clicks
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (
+        notificationRef.current &&
+        !notificationRef.current.contains(event.target as Node) &&
+        !(event.target as Element).closest('button[aria-label="Notifications"]')
+      ) {
+        setIsOpen(false);
+      }
+    };
+
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
+
   return (
-    <div className="relative">
+    <div className="relative" ref={notificationRef}>
       <button
+        aria-label="Notifications"
         onClick={() => setIsOpen(!isOpen)}
         className="p-2 hover:bg-gray-100 rounded-full relative"
       >
