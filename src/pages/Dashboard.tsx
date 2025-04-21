@@ -13,10 +13,13 @@ import { Note } from "../types/Note";
 import Button from "../components/Button";
 import { getNoteEmoji, timeSince } from "../utils/helperFunctions";
 import { NoteViewerModal } from "../components/NoteViewerModal";
+import { useDispatch } from "react-redux";
+import { hideLoader, showLoader } from "../store/slices/loaderSlice";
 
 const Dashboard = () => {
   const { user } = useAuth();
   const navigate = useNavigate();
+  const dispatch = useDispatch();
   const [notesCount, setNotesCount] = useState<number>(0);
   const [recentNotes, setRecentNotes] = useState<Note[]>([]);
   const [viewingNote, setViewingNote] = useState<Note | null>(null);
@@ -39,10 +42,17 @@ const Dashboard = () => {
   useEffect(() => {
     if (user) {
       const fetchNotesCount = async () => {
-        const count = await getUserNotesCount(user?.uid);
-        const notes = await getRecentNotes(user.uid);
-        setNotesCount(count);
-        setRecentNotes(notes);
+        try {
+          dispatch(showLoader());
+          const count = await getUserNotesCount(user?.uid);
+          const notes = await getRecentNotes(user.uid);
+          setNotesCount(count);
+          setRecentNotes(notes);
+        } catch (error) {
+          console.error(error);
+        } finally {
+          dispatch(hideLoader());
+        }
       };
       fetchNotesCount();
     }

@@ -17,6 +17,7 @@ import { addToast } from "../store/slices/toastSlice";
 import { v4 as uuidv4 } from "uuid";
 import { FaStickyNote } from "react-icons/fa";
 import { NoteViewerModal } from "../components/NoteViewerModal";
+import { hideLoader, showLoader } from "../store/slices/loaderSlice";
 
 const NotesPage = () => {
   const dispatch = useDispatch();
@@ -56,10 +57,17 @@ const NotesPage = () => {
   };
 
   const fetchNotes = async () => {
-    if (!user) return;
-    const userNotes = await getUserNotes(user.uid);
-    setNotes(userNotes);
-    setFilteredNotes(userNotes);
+    try {
+      dispatch(showLoader());
+      if (!user) return;
+      const userNotes = await getUserNotes(user.uid);
+      setNotes(userNotes);
+      setFilteredNotes(userNotes);
+    } catch (error) {
+      console.error(error);
+    } finally {
+      dispatch(hideLoader());
+    }
   };
 
   const handleSaveNote = async (

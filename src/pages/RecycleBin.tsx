@@ -15,6 +15,7 @@ import { EmptyState } from "../components/EmptyState";
 import { useDispatch } from "react-redux";
 import { addToast } from "../store/slices/toastSlice";
 import { v4 as uuidv4 } from "uuid";
+import { hideLoader, showLoader } from "../store/slices/loaderSlice";
 
 export const RecycleBin = () => {
   const { user } = useAuth();
@@ -26,8 +27,15 @@ export const RecycleBin = () => {
   const [selectedNote, setSelectedNote] = useState<string | null>(null);
 
   const getSoftDeleteNotes = async () => {
-    const deletedNotes = await fetchSoftDeleteNotes(user?.uid ?? "");
-    setSoftDeleteNotes(deletedNotes);
+    try {
+      dispatch(showLoader());
+      const deletedNotes = await fetchSoftDeleteNotes(user?.uid ?? "");
+      setSoftDeleteNotes(deletedNotes);
+    } catch (error) {
+      console.error(error);
+    } finally {
+      dispatch(hideLoader());
+    }
   };
 
   const handleRestore = async (noteId: string) => {

@@ -3,6 +3,7 @@ import Sidebar from "../components/Sidebar";
 import { ReactNode } from "react";
 import { useLocation } from "react-router-dom";
 import Toaster from "../components/Toaster";
+import Loader from "../components/Loader";
 
 const noSidebarRoutes = ["/"];
 
@@ -22,6 +23,7 @@ const AppLayout = ({ children }: AppLayoutProps) => {
           hideSidebar ? "w-full" : ""
         }`}
       >
+        <Loader />
         <Toaster />
         {children}
       </main>
