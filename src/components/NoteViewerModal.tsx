@@ -55,7 +55,10 @@ export const NoteViewerModal = ({ isOpen, note, onClose }: Props) => {
               )}
 
               <div className="prose max-h-[60vh] overflow-y-auto">
-                <div dangerouslySetInnerHTML={{ __html: note.content }} />
+                <div
+                  className="text-base [&_ul]:list-disc [&_ul]:pl-5 [&_li]:mb-1"
+                  dangerouslySetInnerHTML={{ __html: note.content }}
+                />
               </div>
 
               <div className="mt-6 flex flex-wrap gap-4 items-center justify-between">
