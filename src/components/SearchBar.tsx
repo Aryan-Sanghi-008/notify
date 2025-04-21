@@ -9,7 +9,7 @@ interface SearchBarProps {
 }
 
 const SearchBar = ({ onSearch, placeholder }: SearchBarProps) => {
-  const [query, setQuery] = useState("");
+  const [query, setQuery] = useState<string>("");
 
   useEffect(() => {
     const delayDebounce = setTimeout(() => {

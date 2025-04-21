@@ -24,51 +24,84 @@ interface NoteCardProps {
   onTogglePin: (note: Note) => void;
 }
 
-const NoteCard: React.FC<NoteCardProps> = ({
-  note,
-  onView,
-  onToggleFavorite,
-  onEdit,
-  onDelete,
-  onTogglePin,
-}) => {
+const NoteCard: React.FC<NoteCardProps> = ({ note, ...props }) => {
   return (
     <motion.div
-      className="relative rounded-xl p-5 bg-white border border-gray-100 shadow-sm hover:shadow-lg transition-all duration-200 ease-out group"
+      className="relative rounded-xl p-5 border shadow-sm hover:shadow-lg transition-all duration-200 ease-out group"
       style={{ backgroundColor: note.color || "#fff" }}
       whileHover={{ scale: 1.02 }}
       whileTap={{ scale: 0.98 }}
       onClick={(e) => {
         if ((e.target as HTMLElement).closest("[data-no-view]")) return;
-        onView(note);
+        props.onView(note);
       }}
     >
+      {/* Pinned Badge */}
+      {note.isPinned && (
+        <motion.div
+          initial={{ scale: 0 }}
+          animate={{ scale: 1 }}
+          className="absolute -top-3 -right-3 bg-violet-500 p-1.5 rounded-full shadow-lg"
+        >
+          <Pin className="w-5 h-5 text-white" fill="currentColor" />
+        </motion.div>
+      )}
+
+      {/* Favorite Badge */}
+      {note.isFavorite && (
+        <motion.div
+          initial={{ scale: 0 }}
+          animate={{ scale: 1 }}
+          className="absolute -top-3 -left-3 bg-amber-500 p-1.5 rounded-full shadow-lg"
+        >
+          <Star className="w-5 h-5 text-white" fill="currentColor" />
+        </motion.div>
+      )}
+
       {/* Header actions */}
       <div className="flex justify-between items-start mb-3">
         <div className="flex gap-1">
           <Button
             size="sm"
             variant="ghost"
-            onClick={() => onToggleFavorite(note)}
-            className="text-amber-400 hover:bg-amber-50/50 hover:text-amber-500 rounded-lg"
+            onClick={() => props.onToggleFavorite(note)}
+            className="rounded-lg group/fav"
             data-no-view
           >
-            <Star
-              size={18}
-              fill={note.isFavorite ? "currentColor" : "transparent"}
-            />
+            <motion.div
+              animate={{ scale: note.isFavorite ? 1.2 : 1 }}
+              transition={{ type: "spring" }}
+            >
+              <Star
+                size={18}
+                className={`${
+                  note.isFavorite
+                    ? "text-amber-500 fill-amber-500"
+                    : "text-gray-400 hover:text-amber-400"
+                }`}
+              />
+            </motion.div>
           </Button>
           <Button
             size="sm"
             variant="ghost"
-            onClick={() => onTogglePin(note)}
-            className="text-gray-500 hover:bg-gray-100 hover:text-gray-700 rounded-lg"
+            onClick={() => props.onTogglePin(note)}
+            className="rounded-lg group/pin"
             data-no-view
           >
-            <Pin
-              size={18}
-              fill={note.isPinned ? "currentColor" : "transparent"}
-            />
+            <motion.div
+              animate={{ rotate: note.isPinned ? 0 : 45 }}
+              transition={{ type: "spring" }}
+            >
+              <Pin
+                size={18}
+                className={`${
+                  note.isPinned
+                    ? "text-violet-600 fill-violet-600"
+                    : "text-gray-400 hover:text-violet-500"
+                }`}
+              />
+            </motion.div>
           </Button>
         </div>
 
@@ -80,7 +113,7 @@ const NoteCard: React.FC<NoteCardProps> = ({
             <MenuItem>
               {() => (
                 <button
-                  onClick={() => onEdit(note)}
+                  onClick={() => props.onEdit(note)}
                   className="flex items-center gap-2 w-full px-4 py-2.5 text-sm hover:bg-gray-50 text-gray-700"
                 >
                   <Pencil size={16} className="text-gray-500" /> Edit
@@ -90,7 +123,7 @@ const NoteCard: React.FC<NoteCardProps> = ({
             <MenuItem>
               {({ focus }) => (
                 <button
-                  onClick={() => onDelete(note)}
+                  onClick={() => props.onDelete(note)}
                   className={`flex items-center gap-2 w-full px-4 py-2.5 text-sm ${
                     focus ? "bg-red-50" : ""
                   } text-red-600 hover:bg-red-50`}
@@ -167,6 +200,10 @@ const NoteCard: React.FC<NoteCardProps> = ({
           {format(note.updatedAt.toDate(), "dd MMM yyyy")}
         </span>
       </div>
+
+      {note.isFavorite && (
+        <div className="absolute inset-0 rounded-xl pointer-events-none border-2 border-amber-200/50" />
+      )}
     </motion.div>
   );
 };

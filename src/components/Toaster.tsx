@@ -13,7 +13,7 @@ const Toaster: React.FC = () => {
     const timeoutIds = toasts.map((toast: Toast) =>
       setTimeout(() => {
         dispatch(removeToast(toast.id));
-      }, 5000)
+      }, 2000)
     );
 
     return () => timeoutIds.forEach(clearTimeout);

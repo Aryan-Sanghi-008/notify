@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { Plus } from "lucide-react";
 import NoteModal from "../components/NoteModal";
 import { Note } from "../types/Note";
@@ -23,8 +23,8 @@ import SearchBar from "../components/SearchBar";
 const NotesPage = () => {
   const dispatch = useDispatch();
   const { user } = useAuth();
-  const [_notes, setNotes] = useState<Note[]>([]);
-  const [filteredNotes, setFilteredNotes] = useState<Note[]>([]);
+  const [notes, setNotes] = useState<Note[]>([]);
+  const [searchQuery, setSearchQuery] = useState<string>("");
   const [modalOpen, setModalOpen] = useState(false);
   const [editingNote, setEditingNote] = useState<Note | null>(null);
   const [warningOpen, setWarningOpen] = useState(false);
@@ -62,8 +62,8 @@ const NotesPage = () => {
       dispatch(showLoader());
       if (!user) return;
       const userNotes = await getUserNotes(user.uid);
-      setNotes(userNotes);
-      setFilteredNotes(userNotes);
+      const sortedNotes = userNotes.sort(sortNotes);
+      setNotes(sortedNotes);
     } catch (error) {
       console.error(error);
     } finally {
@@ -123,15 +123,83 @@ const NotesPage = () => {
     setModalOpen(true);
   };
 
+  const sortNotes = (a: Note, b: Note) => {
+    // Pinned first
+    if (a.isPinned && !b.isPinned) return -1;
+    if (!a.isPinned && b.isPinned) return 1;
+
+    // Favorites next
+    if (a.isFavorite && !b.isFavorite) return -1;
+    if (!a.isFavorite && b.isFavorite) return 1;
+
+    // Then by last modified
+    return b.updatedAt.toMillis() - a.updatedAt.toMillis();
+  };
+
   const handleToggleFavorite = async (note: Note) => {
-    await updateNote(note.id, { isFavorite: !note.isFavorite });
-    fetchNotes();
+    const newFavoriteState = !note.isFavorite;
+    await updateNote(note.id, { isFavorite: newFavoriteState });
+
+    dispatch(
+      addToast({
+        message: newFavoriteState
+          ? "Note added to favorites ★"
+          : "Note removed from favorites",
+        type: newFavoriteState ? "success" : "info",
+        id: uuidv4(),
+      })
+    );
+
+    setNotes((prevNotes) =>
+      prevNotes
+        .map((n) =>
+          n.id === note.id ? { ...n, isFavorite: newFavoriteState } : n
+        )
+        .sort(sortNotes)
+    );
   };
 
   const handleTogglePin = async (note: Note) => {
-    await updateNote(note.id, { isPinned: !note.isPinned });
-    fetchNotes();
+    const newPinState = !note.isPinned;
+    await updateNote(note.id, { isPinned: newPinState });
+
+    dispatch(
+      addToast({
+        message: newPinState ? "Note pinned to top 📌" : "Note unpinned",
+        type: newPinState ? "success" : "info",
+        id: uuidv4(),
+      })
+    );
+
+    setNotes((prevNotes) =>
+      prevNotes
+        .map((n) => (n.id === note.id ? { ...n, isPinned: newPinState } : n))
+        .sort(sortNotes)
+    );
   };
+
+  const filteredNotes = useMemo(() => {
+    if (!searchQuery) return notes;
+
+    const searchLower = searchQuery.toLowerCase();
+
+    return notes
+      .filter(
+        (note) =>
+          // Include if pinned/favorite OR matches search
+          note.isPinned ||
+          note.isFavorite ||
+          note.tags?.some((tag) => tag.toLowerCase().includes(searchLower))
+      )
+      .sort((a, b) => {
+        // Maintain sorting priority even in search results
+        if (a.isPinned && !b.isPinned) return -1;
+        if (!a.isPinned && b.isPinned) return 1;
+        if (a.isFavorite && !b.isFavorite) return -1;
+        if (!a.isFavorite && b.isFavorite) return 1;
+        return b.updatedAt.toMillis() - a.updatedAt.toMillis();
+      });
+  }, [notes, searchQuery]);
 
   useEffect(() => {
     fetchNotes();
@@ -148,16 +216,10 @@ const NotesPage = () => {
             </h1>
             <SearchBar
               placeholder="Search notes by tags..."
-              onSearch={(searchQuery) => {
-                const filtered = _notes.filter((note) =>
-                  note.tags?.some((tag) =>
-                    tag.toLowerCase().includes(searchQuery)
-                  )
-                );
-                setFilteredNotes(searchQuery ? filtered : _notes);
-              }}
+              onSearch={(query) => setSearchQuery(query)}
             />
           </div>
+
           {filteredNotes.length > 0 && (
             <Button
               icon={<Plus className="w-4 h-4" />}
