@@ -3,9 +3,16 @@ import Button from "../components/Button";
 import { useAuth } from "../hooks/useAuth";
 import { FcGoogle } from "react-icons/fc";
 import { FiArrowRight } from "react-icons/fi";
+import { useEffect } from "react";
+import { firebaseConfig } from "../lib/firebase/firebase";
 
 export const AuthPage = () => {
   const { signIn } = useAuth();
+
+  useEffect(() =>
+  {
+    console.log("firebase", firebaseConfig)
+  }, [firebaseConfig])
 
   return (
     <div className="min-h-screen w-screen bg-gradient-to-br from-violet-900 via-indigo-900 to-purple-900 flex items-center justify-center p-4">
