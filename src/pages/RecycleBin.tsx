@@ -16,6 +16,7 @@ import { useDispatch } from "react-redux";
 import { addToast } from "../store/slices/toastSlice";
 import { v4 as uuidv4 } from "uuid";
 import { hideLoader, showLoader } from "../store/slices/loaderSlice";
+import { addNotification } from "../store/slices/notificationSlice";
 
 export const RecycleBin = () => {
   const { user } = useAuth();
@@ -45,6 +46,13 @@ export const RecycleBin = () => {
         message: "Restore note successfully",
         type: "success",
         id: uuidv4(),
+      })
+    );
+    dispatch(
+      addNotification({
+        message: `You've restored a note`,
+        type: "update",
+        noteId: noteId,
       })
     );
     await getSoftDeleteNotes();

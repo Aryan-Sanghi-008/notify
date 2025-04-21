@@ -15,6 +15,9 @@ import { getNoteEmoji, timeSince } from "../utils/helperFunctions";
 import { NoteViewerModal } from "../components/NoteViewerModal";
 import { useDispatch } from "react-redux";
 import { hideLoader, showLoader } from "../store/slices/loaderSlice";
+import NotificationCenter from "../components/NotificationCenter";
+import { addNotification } from "../store/slices/notificationSlice";
+import { formatDistanceToNow } from "date-fns";
 
 const Dashboard = () => {
   const { user } = useAuth();
@@ -58,8 +61,34 @@ const Dashboard = () => {
     }
   }, [user]);
 
+  useEffect(() => {
+    const checkReminders = () => {
+      recentNotes.forEach((note) => {
+        if (note.reminder) {
+          const reminderDate = new Date(note.reminder);
+          const now = new Date();
+          const timeDiff = reminderDate.getTime() - now.getTime();
+
+          if (timeDiff > 0 && timeDiff <= 24 * 60 * 60 * 1000) {
+            dispatch(
+              addNotification({
+                message: `Reminder: "${
+                  note.title
+                }" created ${formatDistanceToNow(note.createdAt.toDate())} ago`,
+                type: "reminder",
+                noteId: note.id,
+              })
+            );
+          }
+        }
+      });
+    };
+
+    checkReminders();
+  }, [recentNotes, dispatch]);
+
   return (
-    <div className="p-8 min-h-screen">
+    <div className="p-4 min-h-screen">
       <div className="max-w-7xl mx-auto space-y-8">
         <header className="bg-gradient-to-r from-violet-600 to-blue-500 rounded-2xl p-6 shadow-lg">
           <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between">
@@ -87,6 +116,7 @@ const Dashboard = () => {
                 </p>
               </div>
             </div>
+            <NotificationCenter />
           </div>
         </header>
 

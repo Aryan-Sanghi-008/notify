@@ -19,6 +19,7 @@ import { FaStickyNote } from "react-icons/fa";
 import { NoteViewerModal } from "../components/NoteViewerModal";
 import { hideLoader, showLoader } from "../store/slices/loaderSlice";
 import SearchBar from "../components/SearchBar";
+import { addNotification } from "../store/slices/notificationSlice";
 
 const NotesPage = () => {
   const dispatch = useDispatch();
@@ -50,6 +51,13 @@ const NotesPage = () => {
         message: "Note deleted successfully",
         type: "success",
         id: uuidv4(),
+      })
+    );
+    dispatch(
+      addNotification({
+        message: `You've deleted note "${noteToDelete.title}"`,
+        type: "delete",
+        noteId: noteToDelete.id,
       })
     );
     setWarningOpen(false);
@@ -97,6 +105,15 @@ const NotesPage = () => {
           id: uuidv4(),
         })
       );
+      dispatch(
+        addNotification({
+          message: `You've
+           updated
+           note "${editingNote.title}"`,
+          type: "update",
+          noteId: editingNote?.id,
+        })
+      );
       setEditingNote(null);
     } else {
       await createNote({
@@ -110,6 +127,14 @@ const NotesPage = () => {
           message: "Note created successfully",
           type: "success",
           id: uuidv4(),
+        })
+      );
+      dispatch(
+        addNotification({
+          message: `You've created
+           note "${title}"`,
+          type: "update",
+          noteId: uuidv4(),
         })
       );
     }
