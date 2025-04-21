@@ -23,5 +23,6 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
-/src/env.txt
+.env
+env.txt
 
