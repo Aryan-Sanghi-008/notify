@@ -16,13 +16,14 @@ import { NoteViewerModal } from "../components/NoteViewerModal";
 import { useDispatch } from "react-redux";
 import { hideLoader, showLoader } from "../store/slices/loaderSlice";
 import NotificationCenter from "../components/NotificationCenter";
-import { addNotification } from "../store/slices/notificationSlice";
-import { formatDistanceToNow } from "date-fns";
 
 const Dashboard = () => {
   const { user } = useAuth();
   const navigate = useNavigate();
   const dispatch = useDispatch();
+
+  // TODO : Reminder Config
+  // const notifications = useSelector((state: RootState) => state.notifications.notifications);
   const [notesCount, setNotesCount] = useState<number>(0);
   const [recentNotes, setRecentNotes] = useState<Note[]>([]);
   const [viewingNote, setViewingNote] = useState<Note | null>(null);
@@ -61,31 +62,45 @@ const Dashboard = () => {
     }
   }, [user]);
 
-  useEffect(() => {
-    const checkReminders = () => {
-      recentNotes.forEach((note) => {
-        if (note.reminder) {
-          const reminderDate = new Date(note.reminder);
-          const now = new Date();
-          const timeDiff = reminderDate.getTime() - now.getTime();
 
-          if (timeDiff > 0 && timeDiff <= 24 * 60 * 60 * 1000) {
-            dispatch(
-              addNotification({
-                message: `Reminder: "${
-                  note.title
-                }" created ${formatDistanceToNow(note.createdAt.toDate())} ago`,
-                type: "reminder",
-                noteId: note.id,
-              })
-            );
-          }
-        }
-      });
-    };
+  // TODO : Reminder config, need some approach in this
 
-    checkReminders();
-  }, [recentNotes, dispatch]);
+  // useEffect(() => {
+  //   const checkReminders = () => {
+  //     const now = new Date();
+  //     recentNotes.forEach((note) => {
+  //       if (note.reminder) {
+  //         try {
+  //           const reminderDate = note.reminder;
+  //           const timeDiff = reminderDate.getTime() - now.getTime();
+
+  //           if (timeDiff > 0 && timeDiff <= 24 * 60 * 60 * 1000) {
+  //             // Check for existing unread reminder notifications
+  //             const hasUnreadReminder = notifications.some(
+  //               (n) => n.noteId === note.id && n.type === "reminder" && !n.read
+  //             );
+
+  //             if (!hasUnreadReminder) {
+  //               dispatch(
+  //                 addNotification({
+  //                   message: `Reminder: "${note.title}" due in ${Math.ceil(
+  //                     timeDiff / (60 * 60 * 1000)
+  //                   )} hours`,
+  //                   type: "reminder",
+  //                   noteId: note.id,
+  //                 })
+  //               );
+  //             }
+  //           }
+  //         } catch (error) {
+  //           console.error("Error processing reminder:", error);
+  //         }
+  //       }
+  //     });
+  //   };
+
+  //   checkReminders();
+  // }, [recentNotes, dispatch, notifications]);
 
   return (
     <div className="p-4 min-h-screen">
