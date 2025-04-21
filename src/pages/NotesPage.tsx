@@ -18,6 +18,7 @@ import { v4 as uuidv4 } from "uuid";
 import { FaStickyNote } from "react-icons/fa";
 import { NoteViewerModal } from "../components/NoteViewerModal";
 import { hideLoader, showLoader } from "../store/slices/loaderSlice";
+import SearchBar from "../components/SearchBar";
 
 const NotesPage = () => {
   const dispatch = useDispatch();
@@ -141,9 +142,22 @@ const NotesPage = () => {
       <div className="max-w-7xl mx-auto py-4">
         {/* Header */}
         <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-8 px-4">
-          <h1 className="text-2xl md:text-3xl font-bold text-violet-700">
-            Your Notes
-          </h1>
+          <div className="flex items-center gap-4 w-full max-w-2xl">
+            <h1 className="text-2xl md:text-3xl font-bold text-violet-700 shrink-0">
+              Your Notes
+            </h1>
+            <SearchBar
+              placeholder="Search notes by tags..."
+              onSearch={(searchQuery) => {
+                const filtered = _notes.filter((note) =>
+                  note.tags?.some((tag) =>
+                    tag.toLowerCase().includes(searchQuery)
+                  )
+                );
+                setFilteredNotes(searchQuery ? filtered : _notes);
+              }}
+            />
+          </div>
           {filteredNotes.length > 0 && (
             <Button
               icon={<Plus className="w-4 h-4" />}
