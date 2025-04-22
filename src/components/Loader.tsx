@@ -9,61 +9,58 @@ const Loader = () => {
     <AnimatePresence>
       {visible && (
         <motion.div
-          initial={{ opacity: 0, backdropFilter: "blur(0px)" }}
-          animate={{ opacity: 1, backdropFilter: "blur(8px)" }}
-          exit={{ opacity: 0, backdropFilter: "blur(0px)" }}
-          transition={{ duration: 0.3, ease: "easeInOut" }}
-          className="fixed inset-0 z-[9999] flex items-center justify-center bg-emerald-50/80 backdrop-blur-md"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          exit={{ opacity: 0 }}
+          transition={{ duration: 0.2 }}
+          className="fixed inset-0 z-[9999] flex items-center justify-center bg-white/90 backdrop-blur-md"
         >
-          <div className="relative flex flex-col items-center gap-4">
-            {/* Outer progress indicator */}
+          <div className="flex flex-col items-center gap-4">
+            {/* Paper Sheet Spinner */}
             <motion.div
-              className="absolute -inset-4"
-              initial={{ rotate: 0 }}
-              animate={{ rotate: 360 }}
+              className="relative h-16 w-16 rounded-lg bg-gradient-to-br from-indigo-50 to-indigo-100 shadow-lg"
+              animate={{
+                rotate: [0, 5, -5, 0],
+                y: [0, -8, 0],
+              }}
               transition={{
+                duration: 2,
                 repeat: Infinity,
-                duration: 3,
-                ease: "linear",
+                ease: "easeInOut",
               }}
             >
-              <div className="w-full h-full border-[3px] border-dashed border-emerald-100 rounded-full" />
+              {/* Folded Corner */}
+              <div className="absolute top-0 right-0 w-4 h-4 bg-indigo-100 rounded-tr-lg rounded-bl-sm" />
+              
+              {/* Animated Writing Line */}
+              <motion.div
+                className="absolute left-2 right-2 h-0.5 bg-indigo-300 top-6"
+                initial={{ scaleX: 0 }}
+                animate={{ scaleX: 1 }}
+                transition={{
+                  repeat: Infinity,
+                  duration: 1.5,
+                  ease: "anticipate",
+                }}
+              />
             </motion.div>
 
-            {/* Main spinner */}
+            {/* Text with Animated Dots */}
             <motion.div
-              variants={{
-                spin: { rotate: 360, scale: [1, 1.1, 1] },
-              }}
-              initial="spin"
-              animate="spin"
-              transition={{
-                duration: 1.2,
-                ease: "anticipate",
-                repeat: Infinity,
-              }}
-              className="relative h-14 w-14 rounded-full bg-gradient-to-br from-emerald-500 to-emerald-700 shadow-lg shadow-emerald-100"
-            >
-              {/* Inner cutout */}
-              <div className="absolute inset-1 bg-white/30 backdrop-blur-sm rounded-full" />
-            </motion.div>
-
-            {/* Text with animated dots */}
-            <motion.div
-              className="flex items-center gap-1 text-emerald-800 font-medium"
-              initial={{ opacity: 0, y: 10 }}
+              className="flex items-center gap-1 text-indigo-800 font-medium"
+              initial={{ opacity: 0, y: 5 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.2 }}
             >
-              Loading
+              Jotting Down
               {[...Array(3)].map((_, i) => (
                 <motion.span
                   key={i}
-                  className="inline-block origin-bottom"
-                  animate={{ y: [0, -4, 0] }}
+                  className="inline-block"
+                  animate={{ y: [0, -2, 0] }}
                   transition={{
                     repeat: Infinity,
-                    delay: i * 0.2,
+                    delay: i * 0.3,
                     duration: 0.8,
                   }}
                 >
