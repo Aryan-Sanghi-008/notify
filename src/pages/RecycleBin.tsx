@@ -5,21 +5,22 @@ import {
   fetchSoftDeleteNotes,
   restoreNote,
 } from "../lib/firebase/notes";
-import { useAuth } from "../hooks/useAuth";
 import { FiClock, FiTrash2, FiCornerUpLeft } from "react-icons/fi";
 import { getNoteEmoji, timeSince } from "../utils/helperFunctions";
 import { NoteViewerModal } from "../components/NoteViewerModal";
 import { motion } from "framer-motion";
 import WarningModal from "../components/WarningModal";
 import { EmptyState } from "../components/EmptyState";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { addToast } from "../store/slices/toastSlice";
 import { v4 as uuidv4 } from "uuid";
 import { hideLoader, showLoader } from "../store/slices/loaderSlice";
 import { addNotification } from "../store/slices/notificationSlice";
+import { RootState } from "../store/store";
 
 export const RecycleBin = () => {
-  const { user } = useAuth();
+  const user = useSelector((state: RootState) => state.auth.user);
+
   const dispatch = useDispatch();
   const [softDeleteNotes, setSoftDeleteNotes] = useState<Note[]>([]);
   const [viewingNote, setViewingNote] = useState<Note | null>(null);

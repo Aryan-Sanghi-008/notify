@@ -1,19 +1,36 @@
-import { configureStore } from "@reduxjs/toolkit";
+import { combineReducers, configureStore } from "@reduxjs/toolkit";
 import toastReducer from "./slices/toastSlice";
-import loaderReducer from "./slices/loaderSlice"
-import notificationReducer  from "./slices/notificationSlice";
+import loaderReducer from "./slices/loaderSlice";
+import { persistReducer, persistStore } from "redux-persist";
+import storage from "redux-persist/lib/storage";
+import authReducer from "./slices/authslice";
+import notificationReducer from "./slices/notificationSlice";
 
-// Create the Redux store
-const store = configureStore({
-  reducer: {
-    toast: toastReducer,
-    loader: loaderReducer,
-    notifications: notificationReducer,
-  },
+const rootReducer = combineReducers({
+  toast: toastReducer,
+  loader: loaderReducer,
+  notifications: notificationReducer,
+  auth: authReducer,
 });
 
-// Type definition for the root state
-export type RootState = ReturnType<typeof store.getState>;
+const persistConfig = {
+  key: "root",
+  storage,
+  whitelist: ["auth"],
+};
 
-// Export the store for use in your app
+const persistedReducer = persistReducer(persistConfig, rootReducer);
+
+export const store = configureStore({
+  reducer: persistedReducer,
+  middleware: (getDefaultMiddleware) =>
+    getDefaultMiddleware({
+      serializableCheck: {
+        ignoredActions: ["persist/PERSIST", "persist/REHYDRATE"],
+      },
+    }),
+});
+
+export const persistor = persistStore(store);
+export type RootState = ReturnType<typeof store.getState>;
 export default store;

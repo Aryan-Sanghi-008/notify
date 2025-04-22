@@ -1,4 +1,3 @@
-import { useAuth } from "../hooks/useAuth";
 import {
   FaStickyNote,
   FaUserCircle,
@@ -13,12 +12,14 @@ import { Note } from "../types/Note";
 import Button from "../components/Button";
 import { getNoteEmoji, timeSince } from "../utils/helperFunctions";
 import { NoteViewerModal } from "../components/NoteViewerModal";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { hideLoader, showLoader } from "../store/slices/loaderSlice";
 import NotificationCenter from "../components/NotificationCenter";
+import { RootState } from "../store/store";
 
 const Dashboard = () => {
-  const { user } = useAuth();
+  const user = useSelector((state: RootState) => state.auth.user);
+
   const navigate = useNavigate();
   const dispatch = useDispatch();
 
@@ -61,7 +62,6 @@ const Dashboard = () => {
       fetchNotesCount();
     }
   }, [user]);
-
 
   // TODO : Reminder config, need some approach in this
 

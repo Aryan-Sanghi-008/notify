@@ -1,33 +1,36 @@
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import { auth, provider } from "../lib/firebase/firebase";
-import {
-  signInWithPopup,
-  signOut,
-  onAuthStateChanged,
-  User,
-} from "firebase/auth";
+import { signInWithPopup, signOut, onAuthStateChanged } from "firebase/auth";
+import { useDispatch } from "react-redux";
+import { resetAuth, setUser } from "../store/slices/authslice";
 
 export function useAuth() {
-  const [user, setUser] = useState<User | null>(null);
+  const dispatch = useDispatch();
 
   useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
-      setUser(currentUser);
+    const unsubscribe = onAuthStateChanged(auth, (firebaseUser) => {
+      if (firebaseUser) {
+        const { uid, email, displayName, photoURL } = firebaseUser;
+        dispatch(setUser({ uid, email, displayName, photoURL }));
+      } else {
+        dispatch(setUser(null));
+      }
     });
-
     return () => unsubscribe();
-  }, []);
+  }, [dispatch]);
 
   const signIn = () => {
-    signInWithPopup(auth, provider)
-      .then((_result) => {
-      })
-      .catch((error) => {
-        console.error("Popup Sign-in error:", error);
-      });
+    signInWithPopup(auth, provider).catch((error) => {
+      console.error("Login error:", error);
+    });
   };
 
-  const logout = () => signOut(auth);
-
-  return { user, signIn, logout };
+  const logout = () => {
+    signOut(auth)
+      .then(() => {
+        dispatch(resetAuth());
+      })
+      .catch(console.error);
+  };
+  return { signIn, logout };
 }

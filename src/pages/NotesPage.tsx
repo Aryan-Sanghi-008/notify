@@ -9,10 +9,9 @@ import {
   softDeleteNote,
   updateNote,
 } from "../lib/firebase/notes";
-import { useAuth } from "../hooks/useAuth";
 import NoteCard from "../components/NoteCard";
 import WarningModal from "../components/WarningModal";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { addToast } from "../store/slices/toastSlice";
 import { v4 as uuidv4 } from "uuid";
 import { FaStickyNote } from "react-icons/fa";
@@ -20,10 +19,12 @@ import { NoteViewerModal } from "../components/NoteViewerModal";
 import { hideLoader, showLoader } from "../store/slices/loaderSlice";
 import SearchBar from "../components/SearchBar";
 import { addNotification } from "../store/slices/notificationSlice";
+import { RootState } from "../store/store";
 
 const NotesPage = () => {
   const dispatch = useDispatch();
-  const { user } = useAuth();
+  const user = useSelector((state: RootState) => state.auth.user);
+
   const [notes, setNotes] = useState<Note[]>([]);
   const [searchQuery, setSearchQuery] = useState<string>("");
   const [modalOpen, setModalOpen] = useState(false);

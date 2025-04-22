@@ -11,11 +11,13 @@ import {
 } from "firebase/firestore";
 import { db } from "../lib/firebase/firebase";
 import { useState, useEffect } from "react";
-import { useAuth } from "./useAuth";
 import { Note } from "../types/Note";
+import { RootState } from "../store/store";
+import { useSelector } from "react-redux";
 
 export const useNotes = () => {
-  const { user } = useAuth();
+  const user = useSelector((state: RootState) => state.auth.user);
+
   const [notes, setNotes] = useState<Note[]>([]);
   const [loading, setLoading] = useState(true);
 

@@ -2,13 +2,14 @@
 import { Routes, Route, Navigate, useLocation } from "react-router-dom";
 import Dashboard from "./pages/Dashboard";
 import { AuthPage } from "./pages/AuthPage";
-import { useAuth } from "./hooks/useAuth";
 import NotesPage from "./pages/NotesPage";
 import AppLayout from "./layouts/AppLayout";
 import { RecycleBin } from "./pages/RecycleBin";
+import { useSelector } from "react-redux";
+import { RootState } from "./store/store";
 
 const AppRoutes = () => {
-  const { user } = useAuth();
+  const user = useSelector((state: RootState) => state.auth.user);
   const location = useLocation();
 
   // Handle redirects based on auth status
