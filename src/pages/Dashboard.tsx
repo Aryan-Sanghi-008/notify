@@ -22,9 +22,6 @@ const Dashboard = () => {
 
   const navigate = useNavigate();
   const dispatch = useDispatch();
-
-  // TODO : Reminder Config
-  // const notifications = useSelector((state: RootState) => state.notifications.notifications);
   const [notesCount, setNotesCount] = useState<number>(0);
   const [recentNotes, setRecentNotes] = useState<Note[]>([]);
   const [viewingNote, setViewingNote] = useState<Note | null>(null);
@@ -62,45 +59,6 @@ const Dashboard = () => {
       fetchNotesCount();
     }
   }, [user]);
-
-  // TODO : Reminder config, need some approach in this
-
-  // useEffect(() => {
-  //   const checkReminders = () => {
-  //     const now = new Date();
-  //     recentNotes.forEach((note) => {
-  //       if (note.reminder) {
-  //         try {
-  //           const reminderDate = note.reminder;
-  //           const timeDiff = reminderDate.getTime() - now.getTime();
-
-  //           if (timeDiff > 0 && timeDiff <= 24 * 60 * 60 * 1000) {
-  //             // Check for existing unread reminder notifications
-  //             const hasUnreadReminder = notifications.some(
-  //               (n) => n.noteId === note.id && n.type === "reminder" && !n.read
-  //             );
-
-  //             if (!hasUnreadReminder) {
-  //               dispatch(
-  //                 addNotification({
-  //                   message: `Reminder: "${note.title}" due in ${Math.ceil(
-  //                     timeDiff / (60 * 60 * 1000)
-  //                   )} hours`,
-  //                   type: "reminder",
-  //                   noteId: note.id,
-  //                 })
-  //               );
-  //             }
-  //           }
-  //         } catch (error) {
-  //           console.error("Error processing reminder:", error);
-  //         }
-  //       }
-  //     });
-  //   };
-
-  //   checkReminders();
-  // }, [recentNotes, dispatch, notifications]);
 
   return (
     <div className="p-4 min-h-screen">

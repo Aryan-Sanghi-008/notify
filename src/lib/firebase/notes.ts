@@ -179,3 +179,30 @@ export const deleteNote = async (id: string): Promise<void> => {
   const noteRef = doc(db, "notes", id);
   await deleteDoc(noteRef);
 };
+
+// READ (get notes with reminders)
+export const getNotesWithRemindersDue = async (
+  userId: string,
+  startDate: Timestamp,
+  endDate: Timestamp
+): Promise<Note[]> => {
+  const notesRef = collection(db, "notes");
+  const q = query(
+    notesRef,
+    where("userId", "==", userId),
+    where("deleteMode", "==", "notDeleted"),
+    where("reminder", ">=", startDate),
+    where("reminder", "<=", endDate)
+  );
+  const snapshot = await getDocs(q);
+  return snapshot.docs.map((doc) => {
+    const data = doc.data();
+    return {
+      id: doc.id,
+      ...data,
+      createdAt: data.createdAt,
+      updatedAt: data.updatedAt,
+      reminder: data.reminder?.toDate() || null,
+    } as Note;
+  });
+};

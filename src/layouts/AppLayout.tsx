@@ -4,6 +4,7 @@ import { ReactNode } from "react";
 import { useLocation } from "react-router-dom";
 import Toaster from "../components/Toaster";
 import Loader from "../components/Loader";
+import useReminderNotifications from "../hooks/useReminderNotifications";
 
 const noSidebarRoutes = ["/"];
 
@@ -14,6 +15,7 @@ type AppLayoutProps = {
 const AppLayout = ({ children }: AppLayoutProps) => {
   const location = useLocation();
   const hideSidebar = noSidebarRoutes.includes(location.pathname);
+  useReminderNotifications();
 
   return (
     <div className="flex min-h-screen bg-gray-50">
