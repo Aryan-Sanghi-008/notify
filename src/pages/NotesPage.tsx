@@ -33,6 +33,7 @@ const NotesPage = () => {
   const [noteToDelete, setNoteToDelete] = useState<Note | null>(null);
   const [viewerOpen, setViewerOpen] = useState(false);
   const [viewingNote, setViewingNote] = useState<Note | null>(null);
+  const [selectedFilter, setSelectedFilter] = useState<string>("title");
 
   const handleViewNote = (note: Note) => {
     setViewingNote(note);
@@ -215,7 +216,11 @@ const NotesPage = () => {
           // Include if pinned/favorite OR matches search
           note.isPinned ||
           note.isFavorite ||
-          note.tags?.some((tag) => tag.toLowerCase().includes(searchLower))
+          (selectedFilter === "tag"
+            ? note.tags?.some((tag) => tag.toLowerCase().includes(searchLower))
+            : selectedFilter === "title"
+            ? note.title.toLowerCase().includes(searchLower)
+            : note.content.toLowerCase().includes(searchLower))
       )
       .sort((a, b) => {
         // Maintain sorting priority even in search results
@@ -225,7 +230,7 @@ const NotesPage = () => {
         if (!a.isFavorite && b.isFavorite) return 1;
         return b.updatedAt.toMillis() - a.updatedAt.toMillis();
       });
-  }, [notes, searchQuery]);
+  }, [notes, searchQuery, selectedFilter]);
 
   useEffect(() => {
     fetchNotes();
@@ -241,8 +246,18 @@ const NotesPage = () => {
               Your Notes
             </h1>
             <SearchBar
-              placeholder="Search notes by tags..."
-              onSearch={(query) => setSearchQuery(query)}
+              placeholder="Search notes by"
+              onSearch={(query, filter) => {
+                setSearchQuery(query);
+                if (filter) setSelectedFilter(filter);
+              }}
+              showFilters
+              filterOptions={[
+                { value: "title", label: "Title" },
+                { value: "content", label: "Content" },
+                { value: "tag", label: "Tags" },
+              ]}
+              onFilterChange={setSelectedFilter}
             />
           </div>
 
