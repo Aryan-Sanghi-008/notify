@@ -1,6 +1,13 @@
 /* src/index.css */
 @import "tailwindcss";
 
+@font-face {
+  font-family: 'Colfax';
+  src: url('/notify/type-font/Colfax-Medium.woff') format('woff');
+  font-weight: 500;
+  font-style: normal;
+}
+
 .custom-scrollbar::-webkit-scrollbar {
   width: 4px;
 }
