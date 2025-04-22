@@ -2,8 +2,8 @@
 @import "tailwindcss";
 
 @font-face {
-  font-family: 'Colfax';
-  src: url('/notify/type-font/Colfax-Medium.woff') format('woff');
+  font-family: "Colfax";
+  src: url("/notify/type-font/Colfax-Medium.woff") format("woff");
   font-weight: 500;
   font-style: normal;
 }
@@ -25,13 +25,12 @@
   background: #555;
 }
 
-
 .ProseMirror {
   min-height: 200px;
   outline: none;
 }
 
-.ProseMirror ul, 
+.ProseMirror ul,
 .ProseMirror ol {
   padding-left: 1.5rem;
 }
@@ -54,14 +53,18 @@ body {
 }
 
 @keyframes float {
-  0%, 100% { transform: translateY(0); }
-  50% { transform: translateY(-10px); }
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-10px);
+  }
 }
 
 .floating {
   animation: float 3s ease-in-out infinite;
 }
-
 
 /* Custom DatePicker styles */
 .react-datepicker {
@@ -100,4 +103,18 @@ body {
 
 .react-datepicker__time-list-item--selected {
   @apply bg-blue-600 text-white hover:bg-blue-600;
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  @apply bg-gray-100;
+}
+
+::-webkit-scrollbar-thumb {
+  @apply bg-gray-300 rounded-full hover:bg-gray-400;
 }

@@ -20,6 +20,7 @@ import { hideLoader, showLoader } from "../store/slices/loaderSlice";
 import SearchBar from "../components/SearchBar";
 import { addNotification } from "../store/slices/notificationSlice";
 import { RootState } from "../store/store";
+import { isSameDay, isSameWeek, isSameMonth, isSameYear } from "date-fns";
 
 const NotesPage = () => {
   const dispatch = useDispatch();
@@ -34,6 +35,11 @@ const NotesPage = () => {
   const [viewerOpen, setViewerOpen] = useState(false);
   const [viewingNote, setViewingNote] = useState<Note | null>(null);
   const [selectedFilter, setSelectedFilter] = useState<string>("title");
+  const [timeFilter, _setTimeFilter] = useState<{
+    type: string;
+    startDate: Date;
+    endDate: Date;
+  }>({ type: "", startDate: new Date(), endDate: new Date() });
 
   const handleViewNote = (note: Note) => {
     setViewingNote(note);
@@ -206,14 +212,32 @@ const NotesPage = () => {
   };
 
   const filteredNotes = useMemo(() => {
-    if (!searchQuery) return notes;
+    let filtered = notes;
 
-    const searchLower = searchQuery.toLowerCase();
+    // Apply time filter
+    if (timeFilter.type) {
+      filtered = filtered.filter((note) => {
+        const noteDate = note.updatedAt.toDate();
+        switch (timeFilter.type) {
+          case "daily":
+            return isSameDay(noteDate, timeFilter.startDate);
+          case "weekly":
+            return isSameWeek(noteDate, timeFilter.startDate);
+          case "monthly":
+            return isSameMonth(noteDate, timeFilter.startDate);
+          case "yearly":
+            return isSameYear(noteDate, timeFilter.startDate);
+          default:
+            return true;
+        }
+      });
+    }
 
-    return notes
-      .filter(
+    // Apply search filter
+    if (searchQuery) {
+      const searchLower = searchQuery.toLowerCase();
+      filtered = filtered.filter(
         (note) =>
-          // Include if pinned/favorite OR matches search
           note.isPinned ||
           note.isFavorite ||
           (selectedFilter === "tag"
@@ -221,16 +245,18 @@ const NotesPage = () => {
             : selectedFilter === "title"
             ? note.title.toLowerCase().includes(searchLower)
             : note.content.toLowerCase().includes(searchLower))
-      )
-      .sort((a, b) => {
-        // Maintain sorting priority even in search results
-        if (a.isPinned && !b.isPinned) return -1;
-        if (!a.isPinned && b.isPinned) return 1;
-        if (a.isFavorite && !b.isFavorite) return -1;
-        if (!a.isFavorite && b.isFavorite) return 1;
-        return b.updatedAt.toMillis() - a.updatedAt.toMillis();
-      });
-  }, [notes, searchQuery, selectedFilter]);
+      );
+    }
+
+    // Sort the notes
+    return filtered.sort((a, b) => {
+      if (a.isPinned && !b.isPinned) return -1;
+      if (!a.isPinned && b.isPinned) return 1;
+      if (a.isFavorite && !b.isFavorite) return -1;
+      if (!a.isFavorite && b.isFavorite) return 1;
+      return b.updatedAt.toMillis() - a.updatedAt.toMillis();
+    });
+  }, [notes, searchQuery, selectedFilter, timeFilter]);
 
   useEffect(() => {
     fetchNotes();
@@ -275,8 +301,13 @@ const NotesPage = () => {
           )}
         </div>
 
+        {/* Time Filter */}
+        {/* <div className="sticky top-0 z-10 mb-4 bg-white/95 backdrop-blur-sm pb-4 px-4">
+          <TimeFilter onChange={setTimeFilter} />
+        </div> */}
+
         {/* Notes Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 px-4">
+        <div className="relative z-0 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 px-4">
           {filteredNotes.map((note) => (
             <NoteCard
               key={note.id}
@@ -297,16 +328,20 @@ const NotesPage = () => {
               <FaStickyNote className="text-6xl inline-block" />
             </div>
             <h3 className="text-lg font-medium text-gray-700 mb-2">
-              No notes found
+              {timeFilter.type || searchQuery
+                ? "No matching notes found"
+                : "No notes yet"}
             </h3>
             <p className="text-gray-500 mb-4">
-              Get started by creating a new note
+              {timeFilter.type || searchQuery
+                ? "Try adjusting your filters or search terms"
+                : "Get started by creating a new note"}
             </p>
             <Button
               icon={<Plus className="w-4 h-4" />}
               onClick={() => setModalOpen(true)}
             >
-              Create First Note
+              Create New Note
             </Button>
           </div>
         )}
