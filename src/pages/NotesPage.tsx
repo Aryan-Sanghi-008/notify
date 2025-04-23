@@ -21,6 +21,7 @@ import SearchBar from "../components/SearchBar";
 import { addNotification } from "../store/slices/notificationSlice";
 import { RootState } from "../store/store";
 import { isSameDay, isSameWeek, isSameMonth, isSameYear } from "date-fns";
+import TimeFilter from "../components/TimeFilter";
 
 const NotesPage = () => {
   const dispatch = useDispatch();
@@ -35,7 +36,7 @@ const NotesPage = () => {
   const [viewerOpen, setViewerOpen] = useState(false);
   const [viewingNote, setViewingNote] = useState<Note | null>(null);
   const [selectedFilter, setSelectedFilter] = useState<string>("title");
-  const [timeFilter, _setTimeFilter] = useState<{
+  const [timeFilter, setTimeFilter] = useState<{
     type: string;
     startDate: Date;
     endDate: Date;
@@ -302,9 +303,9 @@ const NotesPage = () => {
         </div>
 
         {/* Time Filter */}
-        {/* <div className="sticky top-0 z-10 mb-4 bg-white/95 backdrop-blur-sm pb-4 px-4">
+        <div className="sticky top-0 z-10 mb-4 bg-white/95 backdrop-blur-sm pb-4 px-4">
           <TimeFilter onChange={setTimeFilter} />
-        </div> */}
+        </div>
 
         {/* Notes Grid */}
         <div className="relative z-0 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 px-4">
