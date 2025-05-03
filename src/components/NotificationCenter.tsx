@@ -84,11 +84,11 @@ const NotificationCenter = () => {
         await markAsRead(notification.id);
       }
       // Optimistically update local state
-      setNotifications(prev => prev.map(n => 
-        n.id === notification.id 
-          ? { ...n, read: !notification.read } 
-          : n
-      ));
+      setNotifications((prev) =>
+        prev.map((n) =>
+          n.id === notification.id ? { ...n, read: !notification.read } : n
+        )
+      );
     } catch (error) {
       console.error("Error toggling notification read status:", error);
     }
@@ -97,7 +97,7 @@ const NotificationCenter = () => {
   const handleDelete = async (notificationId: string) => {
     try {
       await deleteNotification(notificationId);
-      setNotifications(prev => prev.filter(n => n.id !== notificationId));
+      setNotifications((prev) => prev.filter((n) => n.id !== notificationId));
     } catch (error) {
       console.error("Error deleting notification:", error);
     }
@@ -209,54 +209,67 @@ const NotificationItem: React.FC<NotificationItemProps> = ({
   notification,
   onToggle,
   onDelete,
-}) => (
-  <div
-    className={`p-4 border-b border-gray-100 hover:bg-gray-50 group ${
-      !notification.read ? "bg-white" : "bg-gray-50"
-    }`}
-  >
-    <div className="flex gap-3">
-      <div className="mt-1">{getIcon(notification.type)}</div>
-      <div className="flex-1">
-        <div className="flex justify-between items-start">
-          <p className="text-sm font-medium text-gray-900 mb-1">
-            {notification.message}
-          </p>
-          <button
-            onClick={async (e) => {
-              e.stopPropagation();
-              await onDelete();
-            }}
-            className="opacity-0 group-hover:opacity-100 text-gray-400 hover:text-gray-600"
-          >
-            <XCircle className="w-4 h-4" />
-          </button>
-        </div>
-        <div className="flex items-center justify-between">
-          <span className="text-xs text-gray-500">
-            {formatDistanceToNow(new Date(notification.timestamp))} ago{" "}
-          </span>
-          <button
-            onClick={async (e) => {
-              e.stopPropagation();
-              await onToggle();
-            }}
-            className="text-xs text-blue-500 hover:text-blue-700 flex items-center gap-1"
-          >
-            {notification.read ? (
-              <>
-                <MailOpen className="w-3.5 h-3.5" /> Mark as unread
-              </>
-            ) : (
-              <>
-                <Mail className="w-3.5 h-3.5" /> Mark as read
-              </>
-            )}
-          </button>
+}) => {
+  const safeFormatDistanceToNow = (timestamp: string): string => {
+    try {
+      const date = new Date(timestamp);
+      if (isNaN(date.getTime())) {
+        return "some time ago";
+      }
+      return formatDistanceToNow(date) + " ago";
+    } catch {
+      return "some time ago";
+    }
+  };
+  return (
+    <div
+      className={`p-4 border-b border-gray-100 hover:bg-gray-50 group ${
+        !notification.read ? "bg-white" : "bg-gray-50"
+      }`}
+    >
+      <div className="flex gap-3">
+        <div className="mt-1">{getIcon(notification.type)}</div>
+        <div className="flex-1">
+          <div className="flex justify-between items-start">
+            <p className="text-sm font-medium text-gray-900 mb-1">
+              {notification.message}
+            </p>
+            <button
+              onClick={async (e) => {
+                e.stopPropagation();
+                await onDelete();
+              }}
+              className="opacity-0 group-hover:opacity-100 text-gray-400 hover:text-gray-600"
+            >
+              <XCircle className="w-4 h-4" />
+            </button>
+          </div>
+          <div className="flex items-center justify-between">
+            <span className="text-xs text-gray-500">
+              {safeFormatDistanceToNow(notification.timestamp)} ago{" "}
+            </span>
+            <button
+              onClick={async (e) => {
+                e.stopPropagation();
+                await onToggle();
+              }}
+              className="text-xs text-blue-500 hover:text-blue-700 flex items-center gap-1"
+            >
+              {notification.read ? (
+                <>
+                  <MailOpen className="w-3.5 h-3.5" /> Mark as unread
+                </>
+              ) : (
+                <>
+                  <Mail className="w-3.5 h-3.5" /> Mark as read
+                </>
+              )}
+            </button>
+          </div>
         </div>
       </div>
     </div>
-  </div>
-);
+  );
+};
 
 export default NotificationCenter;

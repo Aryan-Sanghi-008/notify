@@ -12,7 +12,7 @@ import {
   writeBatch,
 } from "firebase/firestore";
 import { db } from "./firebase";
-import { Notification } from "../../types/Notifications"
+import { Notification } from "../../types/Notifications";
 
 // CREATE Notification
 export const createNotification = async (
@@ -88,12 +88,15 @@ export const deleteAllNotifications = async (userId: string): Promise<void> => {
 // Helper to parse Firestore document
 const parseNotification = (doc: any): Notification => {
   const data = doc.data();
+  const millisec =
+    data.timestamp.seconds * 1000 + data.timestamp.nanoseconds / 1000000;
+  const timestamp = new Date(millisec)?.toISOString();
   return {
     id: doc.id,
     message: data.message,
     type: data.type,
     read: data.read,
-    timestamp: data.timestamp.toDate().toISOString(),
+    timestamp,
     noteId: data.noteId || undefined,
     userId: data.userId,
   };

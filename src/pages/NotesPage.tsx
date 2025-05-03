@@ -119,7 +119,7 @@ const NotesPage = () => {
           message: `You've
            updated
            note "${editingNote.title}"`,
-          type: "delete",
+          type: "update",
           noteId: editingNote?.id,
         });
       }
