@@ -3,7 +3,6 @@ import { auth, provider } from "../lib/firebase/firebase";
 import { signInWithPopup, signOut, onAuthStateChanged } from "firebase/auth";
 import { useDispatch } from "react-redux";
 import { resetAuth, setUser } from "../store/slices/authslice";
-import { deleteAllNotifications } from "../store/slices/notificationSlice";
 
 export function useAuth() {
   const dispatch = useDispatch();
@@ -30,7 +29,6 @@ export function useAuth() {
     signOut(auth)
       .then(() => {
         dispatch(resetAuth());
-        dispatch(deleteAllNotifications());
       })
       .catch(console.error);
   };

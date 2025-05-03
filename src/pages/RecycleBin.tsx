@@ -15,8 +15,8 @@ import { useDispatch, useSelector } from "react-redux";
 import { addToast } from "../store/slices/toastSlice";
 import { v4 as uuidv4 } from "uuid";
 import { hideLoader, showLoader } from "../store/slices/loaderSlice";
-import { addNotification } from "../store/slices/notificationSlice";
 import { RootState } from "../store/store";
+import { createNotification } from "../lib/firebase/notifications";
 
 export const RecycleBin = () => {
   const user = useSelector((state: RootState) => state.auth.user);
@@ -49,13 +49,13 @@ export const RecycleBin = () => {
         id: uuidv4(),
       })
     );
-    dispatch(
-      addNotification({
+    if (user) {
+      await createNotification(user.uid, {
         message: `You've restored a note`,
         type: "update",
         noteId: noteId,
-      })
-    );
+      });
+    }
     await getSoftDeleteNotes();
   };
 

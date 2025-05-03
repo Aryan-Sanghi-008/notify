@@ -4,19 +4,17 @@ import loaderReducer from "./slices/loaderSlice";
 import { persistReducer, persistStore } from "redux-persist";
 import storage from "redux-persist/lib/storage";
 import authReducer from "./slices/authslice";
-import notificationReducer from "./slices/notificationSlice";
 
 const rootReducer = combineReducers({
   toast: toastReducer,
   loader: loaderReducer,
-  notifications: notificationReducer,
   auth: authReducer,
 });
 
 const persistConfig = {
   key: "root",
   storage,
-  whitelist: ["auth", "notifications"],
+  whitelist: ["auth"],
 };
 
 const persistedReducer = persistReducer(persistConfig, rootReducer);

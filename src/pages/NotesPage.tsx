@@ -18,10 +18,10 @@ import { FaStickyNote } from "react-icons/fa";
 import { NoteViewerModal } from "../components/NoteViewerModal";
 import { hideLoader, showLoader } from "../store/slices/loaderSlice";
 import SearchBar from "../components/SearchBar";
-import { addNotification } from "../store/slices/notificationSlice";
 import { RootState } from "../store/store";
 import { isSameDay, isSameWeek, isSameMonth, isSameYear } from "date-fns";
 import TimeFilter from "../components/TimeFilter";
+import { createNotification } from "../lib/firebase/notifications";
 
 const NotesPage = () => {
   const dispatch = useDispatch();
@@ -62,13 +62,13 @@ const NotesPage = () => {
         id: uuidv4(),
       })
     );
-    dispatch(
-      addNotification({
+    if (user) {
+      await createNotification(user.uid, {
         message: `You've deleted note "${noteToDelete.title}"`,
         type: "delete",
         noteId: noteToDelete.id,
-      })
-    );
+      });
+    }
     setWarningOpen(false);
     setNoteToDelete(null);
     fetchNotes();
@@ -114,15 +114,15 @@ const NotesPage = () => {
           id: uuidv4(),
         })
       );
-      dispatch(
-        addNotification({
+      if (user) {
+        await createNotification(user.uid, {
           message: `You've
            updated
            note "${editingNote.title}"`,
-          type: "update",
+          type: "delete",
           noteId: editingNote?.id,
-        })
-      );
+        });
+      }
       setEditingNote(null);
     } else {
       await createNote({
@@ -138,14 +138,14 @@ const NotesPage = () => {
           id: uuidv4(),
         })
       );
-      dispatch(
-        addNotification({
+      if (user) {
+        await createNotification(user.uid, {
           message: `You've created
            note "${title}"`,
-          type: "update",
+          type: "create",
           noteId: uuidv4(),
-        })
-      );
+        });
+      }
     }
 
     setModalOpen(false);

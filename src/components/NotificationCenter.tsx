@@ -1,7 +1,5 @@
 // components/NotificationCenter.tsx
 import { useEffect, useRef, useState } from "react";
-import { shallowEqual, useDispatch, useSelector } from "react-redux";
-import { RootState } from "../store/store";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   Bell,
@@ -14,13 +12,15 @@ import {
 } from "lucide-react";
 import { formatDistanceToNow } from "date-fns";
 import {
-  deleteAllNotifications,
-  deleteNotification,
+  getNotifications,
   markAsRead,
   markAsUnread,
-  Notification,
-} from "../store/slices/notificationSlice";
-import { createSelector } from "@reduxjs/toolkit";
+  deleteNotification,
+  deleteAllNotifications,
+} from "../lib/firebase/notifications";
+import { useSelector } from "react-redux";
+import { RootState } from "../store/store";
+import { Notification } from "../types/Notifications";
 
 const getIcon = (type: string) => {
   switch (type) {
@@ -37,29 +37,77 @@ const getIcon = (type: string) => {
   }
 };
 
-interface NotifactionItemProps {
+interface NotificationItemProps {
   notification: Notification;
-  onToggle: () => void;
-  onDelete: () => void;
+  onToggle: () => Promise<void>;
+  onDelete: () => Promise<void>;
 }
 
 const NotificationCenter = () => {
   const [isOpen, setIsOpen] = useState(false);
+  const [notifications, setNotifications] = useState<Notification[]>([]);
+  const [loading, setLoading] = useState(false);
   const notificationRef = useRef<HTMLDivElement>(null);
-  const dispatch = useDispatch();
-  const selectSortedNotifications = createSelector(
-    [(state: RootState) => state.notifications.notifications],
-    (notifications) => {
-      return [...notifications].sort(
-        (a, b) =>
-          new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime()
-      );
-    }
-  );
-  const notifications = useSelector(selectSortedNotifications, shallowEqual);
+  const user = useSelector((state: RootState) => state.auth.user);
 
   const unreadNotifications = notifications.filter((n) => !n.read);
   const readNotifications = notifications.filter((n) => n.read);
+
+  const fetchNotifications = async () => {
+    if (!user) return;
+    setLoading(true);
+    try {
+      const fetchedNotifications = await getNotifications(user.uid);
+      setNotifications(fetchedNotifications);
+    } catch (error) {
+      console.error("Error fetching notifications:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleDeleteAll = async () => {
+    if (!user) return;
+    try {
+      await deleteAllNotifications(user.uid);
+      setNotifications([]);
+    } catch (error) {
+      console.error("Error deleting all notifications:", error);
+    }
+  };
+
+  const handleToggleRead = async (notification: Notification) => {
+    try {
+      if (notification.read) {
+        await markAsUnread(notification.id);
+      } else {
+        await markAsRead(notification.id);
+      }
+      // Optimistically update local state
+      setNotifications(prev => prev.map(n => 
+        n.id === notification.id 
+          ? { ...n, read: !notification.read } 
+          : n
+      ));
+    } catch (error) {
+      console.error("Error toggling notification read status:", error);
+    }
+  };
+
+  const handleDelete = async (notificationId: string) => {
+    try {
+      await deleteNotification(notificationId);
+      setNotifications(prev => prev.filter(n => n.id !== notificationId));
+    } catch (error) {
+      console.error("Error deleting notification:", error);
+    }
+  };
+
+  useEffect(() => {
+    if (isOpen) {
+      fetchNotifications();
+    }
+  }, [isOpen, user]);
 
   // Handle outside clicks
   useEffect(() => {
@@ -103,15 +151,18 @@ const NotificationCenter = () => {
             <div className="p-4 border-b border-gray-200 flex justify-between items-center">
               <h3 className="font-semibold">Notifications</h3>
               <button
-                onClick={() => dispatch(deleteAllNotifications())}
+                onClick={handleDeleteAll}
                 className="text-sm text-red-500 hover:text-red-700 flex items-center gap-1"
+                disabled={notifications.length === 0}
               >
                 <Trash2 className="w-4 h-4" /> Clear All
               </button>
             </div>
 
             <div className="max-h-96 overflow-y-auto">
-              {notifications.length === 0 ? (
+              {loading ? (
+                <div className="p-6 text-center text-gray-500">Loading...</div>
+              ) : notifications.length === 0 ? (
                 <div className="p-6 text-center text-gray-500">
                   No notifications yet
                 </div>
@@ -126,10 +177,8 @@ const NotificationCenter = () => {
                     <NotificationItem
                       key={notification.id}
                       notification={notification}
-                      onToggle={() => dispatch(markAsRead(notification.id))}
-                      onDelete={() =>
-                        dispatch(deleteNotification(notification.id))
-                      }
+                      onToggle={() => handleToggleRead(notification)}
+                      onDelete={() => handleDelete(notification.id)}
                     />
                   ))}
 
@@ -142,14 +191,8 @@ const NotificationCenter = () => {
                     <NotificationItem
                       key={notification.id}
                       notification={notification}
-                      onToggle={() =>
-                        notification.read
-                          ? dispatch(markAsUnread(notification.id))
-                          : dispatch(markAsRead(notification.id))
-                      }
-                      onDelete={() =>
-                        dispatch(deleteNotification(notification.id))
-                      }
+                      onToggle={() => handleToggleRead(notification)}
+                      onDelete={() => handleDelete(notification.id)}
                     />
                   ))}
                 </>
@@ -162,7 +205,7 @@ const NotificationCenter = () => {
   );
 };
 
-const NotificationItem: React.FC<NotifactionItemProps> = ({
+const NotificationItem: React.FC<NotificationItemProps> = ({
   notification,
   onToggle,
   onDelete,
@@ -180,9 +223,9 @@ const NotificationItem: React.FC<NotifactionItemProps> = ({
             {notification.message}
           </p>
           <button
-            onClick={(e) => {
+            onClick={async (e) => {
               e.stopPropagation();
-              onDelete();
+              await onDelete();
             }}
             className="opacity-0 group-hover:opacity-100 text-gray-400 hover:text-gray-600"
           >
@@ -194,9 +237,9 @@ const NotificationItem: React.FC<NotifactionItemProps> = ({
             {formatDistanceToNow(new Date(notification.timestamp))} ago{" "}
           </span>
           <button
-            onClick={(e) => {
+            onClick={async (e) => {
               e.stopPropagation();
-              onToggle();
+              await onToggle();
             }}
             className="text-xs text-blue-500 hover:text-blue-700 flex items-center gap-1"
           >
