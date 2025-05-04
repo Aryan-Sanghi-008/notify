@@ -101,3 +101,46 @@ const parseNotification = (doc: any): Notification => {
     userId: data.userId,
   };
 };
+
+export const checkAndCreateReminderNotifications = async (): Promise<void> => {
+  const now = Timestamp.now();
+  const oneDayLater = new Date(now.toMillis() + 24 * 60 * 60 * 1000);
+  const oneDayLaterTimestamp = Timestamp.fromDate(oneDayLater);
+
+  // 1. Get all notes with reminders in the next 24 hours
+  const notesQuery = query(
+    collection(db, "notes"),
+    where("reminder", "!=", null),
+    where("reminder", ">=", now),
+    where("reminder", "<=", oneDayLaterTimestamp),
+    where("deleteMode", "==", "notDeleted")
+  );
+
+  const notesSnapshot = await getDocs(notesQuery);
+
+  if (notesSnapshot.empty) {
+    console.log("No upcoming reminders found");
+    return;
+  }
+
+  // 2. Create notifications for each upcoming reminder
+  const batch = writeBatch(db);
+  const notificationsRef = collection(db, "notifications");
+
+  notesSnapshot.forEach((noteDoc) => {
+    const note = noteDoc.data();
+    // Create a new document reference with auto-generated ID
+    const newNotificationRef = doc(notificationsRef);
+    batch.set(newNotificationRef, {
+      userId: note.userId,
+      type: "reminder",
+      noteId: noteDoc.id,
+      message: `Reminder: ${note.title || "Untitled note"}`,
+      read: false,
+      timestamp: Timestamp.now(),
+    });
+  });
+
+  await batch.commit();
+  console.log(`Created ${notesSnapshot.size} reminder notifications`);
+};
